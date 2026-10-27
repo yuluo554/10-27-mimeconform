@@ -1,0 +1,118 @@
+# ---- Python 标准模板 ----
+# 字节码与缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 分发与打包
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+pip-wheel-metadata/
+
+# 安装态
+lib/
+lib64/
+parts/
+var/
+local/
+.installed.cfg
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# 测试与覆盖率
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+*.cover
+*.py,cover
+.cache/
+
+# 类型检查与 lint 缓存
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# 构建元数据
+*.spec
+*.manifest
+
+# IDE / 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 本项目：真实邮件与生成物 ----
+# 真实邮件一律不入仓。data/golden/ 下的合成语料在文件末尾单独开例外。
+*.eml
+*.mbox
+*.mbx
+*.msg
+
+# 生成器/CLI 的临时输出目录（可由 golden 源与生成器重建，不入仓）
+fixtures/out/
+data/golden/_out/
+out/
+output/
+
+# 本地审计报告（由 CLI 复算可得，不入仓）
+report.json
+report.md
+*.report.json
+*.ledger.json
+ledger.out.json
+
+# 发布产物本地副本（发布时手工上传 Release，不入仓）
+dist-release/
+release/
+*.whl
+*.tar.gz
+
+# 临时脚本与调试残留（本机路径、一次性补丁一律不入仓）
+tmp/
+.tmp/
+tmp_*.py
+scratch/
+
+# ---- 例外：golden 合成语料必须入库 ----
+# 仅 data/golden/ 下的合成样本（example.invalid 域 + 假附件名）允许提交；
+# 其他任何位置的 *.eml / *.mbox 一律禁止提交。
+!data/golden/**/*.eml
+!data/golden/**/*.mbox
+
+# ---- 说明 ----
+# 1) 上述 `*.eml` / `*.mbox` 排除规则先作用于全局，再由文件末尾的两条 `!` 开例外；
+#    git 的否定规则对"已被排除的目录"无效，故 data/golden/ 目录本身不得被任何
+#    目录级规则排除（本文件未排除它）。
+# 2) 提交前自检：`git ls-files '*.eml' '*.mbox'` 的输出必须全部落在 data/golden/ 下；
+#    出现其他路径即为隐私事故，须立即移除并重写历史。
+# 3) 禁止把真实邮件改名后放进 data/golden/ 逃避检查——该目录只允许语料生成器产出，
+#    由 `python -m mimeconform.devtools.regen --check` 逐字节核对（见 data/README.md §六）。
