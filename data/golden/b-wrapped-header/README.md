@@ -4,6 +4,7 @@
 - 来源：cpython #56141（closed）—— issue 原话：Email multipart boundary detection fails on a wrapped header
 - 输入：`msg.eml`（366 bytes；sha256 `fdd66dc9b8cab1766a82ff543e24fbed68a991bced0569b136765a4d6b098a82`）
 - 期望指纹：`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+- 树指纹：`6e67a65899521c75ebb2a37577aac34d2c4df97ed334749455d840f772e96717`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/b-wrapped-header/msg.eml`

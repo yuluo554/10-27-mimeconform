@@ -4,6 +4,7 @@
 - 来源：自造传输编码样本（无外部来源）
 - 输入：`msg.eml`（335 bytes；sha256 `9fc20144f18e9c1241bf318d0a959ff3d867f4ddf74696d0be9a52692a10cf52`）
 - 期望指纹：`fc55c636cad93403ff8d49f0c4f9f03575c8584fd11a24cb1a2f40baeffd25d6`
+- 树指纹：`ed274d2dcf499ba93a88d3eccdd17fa368f9ac4d40e92a78b945d0580ae36573`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/t-qp-long/msg.eml`

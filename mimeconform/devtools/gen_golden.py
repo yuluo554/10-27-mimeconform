@@ -17,7 +17,10 @@
    一定会在某次拼接调整后悄悄错位；锚点不存在时**构造期断言**直接失败。
 2. ``defect_count`` / ``exit_code`` / ``fingerprint`` **由构造算出**
    （``len(defects)`` / ``decide_exit_code`` / ``ledger.fingerprint``），不手写魔数。
-3. ``tree_digest`` 在 M1 为 ``null`` —— 树由引擎在 M2 产出后回填（数据级自检允许 null）。
+3. ``tree_digest`` 自 M2 起**由引擎回填**（同算法 ``ledger.tree_digest``）：它是"解析结果"
+   的回归基线，只有真跑一遍扫描才可能得到真值 —— 缺陷集仍是手写常量（两者分家：
+   ``defects`` 判"判定对不对"，``tree_digest`` 判"解析有没有变"）。
+   容器类输入（``mail.mbox`` / Maildir）不走单封扫描，其 ``tree_digest`` 保持在 M5 回填。
 4. README 一律用 **issue / SO 编号** 指来源，**不写 URL、不写真实域名**（隐私红线与
    扫描门 `tests/test_fixture_hygiene.py` 的要求；`example.invalid` 是唯一允许的域）。
 
@@ -43,8 +46,9 @@ from typing import Callable
 
 from .. import constants as C
 from ..exit_codes import decide_exit_code
-from ..ledger import dumps, fingerprint
+from ..ledger import dumps, fingerprint, tree_digest
 from ..model import Defect
+from ..scan import scan_message
 
 CRLF = b"\r\n"
 RFC_B_R6 = "RFC 2046 §5.1.1"
@@ -183,13 +187,24 @@ def _case(
     if extra is not None:
         expect["expect_extra"] = extra
     expect["fingerprint"] = fingerprint(ordered)
-    expect["tree_digest"] = None  # M2 起由引擎产出后回填；数据级自检允许 null
+    expect["tree_digest"] = _tree_digest_for(infile, data)
     if stdlib is not None:
         expect["stdlib_compare"] = stdlib
     if note:
         expect["note"] = note
     _NEEDLES[name] = tuple(needles)
     return ({infile: data}, expect)
+
+
+def _tree_digest_for(infile: str, data: bytes) -> str | None:
+    """单封邮件输入的树指纹（M2 起回填）；容器输入留给 M5。
+
+    为什么容器输入不回填：``scan_message`` 的输入契约是**一封消息**，而 mbox / Maildir 是
+    多消息容器 —— 直接喂进去只会得到一个"切分前"的伪树，把它当基线等于给 M5 埋一个假绿。
+    """
+    if not infile.endswith(".eml"):
+        return None
+    return tree_digest(scan_message(data).root)
 
 
 # ── README 渲染（每 case 三件之一）─────────────────────────────────────────
@@ -210,6 +225,8 @@ def _render_readme(name: str, expect: dict[str, object]) -> bytes:
         f"- 来源：{expect['source']}",
         f"- 输入：`{input_info['file']}`（{input_info['bytes']} bytes；sha256 `{input_info['sha256']}`）",
         f"- 期望指纹：`{expect['fingerprint']}`",
+        f"- 树指纹：`{expect['tree_digest']}`"
+        + ("" if expect["tree_digest"] else "（容器输入，自 M5 起回填）"),
         "- 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）",
         "- 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`",
         f"- 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/{name}/{input_info['file']}`",

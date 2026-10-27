@@ -11,7 +11,7 @@
   "defect_count": 0,
   "defects": [],
   "fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  "tree_digest": null,
+  "tree_digest": "6e67a65899521c75ebb2a37577aac34d2c4df97ed334749455d840f772e96717",
   "stdlib_compare": {
     "defects": 0,
     "types": [],

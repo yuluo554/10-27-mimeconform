@@ -4,6 +4,7 @@
 - 来源：SO 79133579——实样 We request all our =ustomers … =o:p> … please make =ure
 - 输入：`msg.eml`（378 bytes；sha256 `8d8004c1ea4e1af81e8d3632a9971ee3d6e8605cac9cf070cdb581d681fd10da`）
 - 期望指纹：`4329adcc8dc4af1d3c24a467596766173eda5d72864242dfb6ee232e122f6a3c`
+- 树指纹：`08da43e6a168a7bd5ea4316eb3e34e05c346e130bd3c1c7e88d9d0dd17890d26`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/t-qp-artifact/msg.eml`

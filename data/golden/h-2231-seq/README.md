@@ -4,6 +4,7 @@
 - 来源：SO 44154520——原话：attachment file names arrive are in gibberish；实样含 name*="UTF-8''%D7%A2...（缺 *0 序号）
 - 输入：`msg.eml`（473 bytes；sha256 `f556793f7c493d7a2d3a2943ea1b112c7359bd122147800f703b4f3543da62b7`）
 - 期望指纹：`76208a3874843cf0a967d179775a577ff14b3619f19bc5b5b2ea07de6b5a2f25`
+- 树指纹：`0791580e081ed284cc53fdd1e25626b95083a36eca6f5132eeeb6b55de9c6e7f`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/h-2231-seq/msg.eml`

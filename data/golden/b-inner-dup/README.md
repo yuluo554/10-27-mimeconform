@@ -4,6 +4,7 @@
 - 来源：cpython #69914（open）—— issue 原话：email parser ignores inner multipart boundary when outer message duplicates it
 - 输入：`msg.eml`（348 bytes；sha256 `d675beb8c7e91569b50ff4a6f080752af4e1ffbb351002084d21a81c67aaff4a`）
 - 期望指纹：`852f6f859643edd119a8c89f64402b8d6703b9102bd863da8234f6ea454c0e12`
+- 树指纹：`a6a8a93a2dce26c743e91564cbc9ed58db3e515f668c94e70d1fcd47efd3081d`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/b-inner-dup/msg.eml`

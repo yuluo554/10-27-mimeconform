@@ -160,8 +160,8 @@ MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
         "M07 缺口格里提已 ✅ 的 M0",
         "plan/06-交付对标与决策.md",
-        "| G1 | 规则判定实现 | ⬜ 待 M2–M5 | 五模块 DoD 全过 |",
-        "| G1 | 规则判定实现（M0） | ⬜ 待 M2–M5 | 五模块 DoD 全过 |",
+        "| G1 | 规则判定实现 |",
+        "| G1 | 规则判定实现（M0） |",
         "LAYOUT.GAPS",
     ),
     Mutation(

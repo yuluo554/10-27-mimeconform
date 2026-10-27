@@ -55,9 +55,27 @@ mimeconform --version
 mimeconform audit sample.eml                      # 账本写 stdout（JSON + Markdown）
 mimeconform audit sample.eml --out report.json    # 按扩展名挑格式
 mimeconform audit sample.eml --out reports/       # 目录形态：两种格式都写
-mimeconform audit sample.mbox --container --mbox-variant=mboxrd
 mimeconform selftest                              # 校验 golden 语料自洽性
 ```
+
+### 三个可照抄的场景（当前能力：单封 `.eml` 的树与边界）
+
+```bash
+# 场景 1：内层 boundary 与外层重复（cpython #69914）→ 退出码 3 + 两棵候选树
+mimeconform audit data/golden/b-inner-dup/msg.eml --out /tmp/dup.json
+#   report 里 "'tree'.'tree_alternatives'" = 2，"'tree'.'divergence'.'path'" = "0.1"
+#   —— 默认展示的树不构成判定，两棵树都要人看
+
+# 场景 2：干净嵌套（负例）→ 退出码 0，缺陷数 0
+mimeconform audit data/golden/b-clean-nested/msg.eml --format json
+
+# 场景 3：缺 final boundary → 退出码 0（仅 diff/note 登记），报告给出"被迫闭合"的字节位置
+mimeconform audit data/golden/b-no-final/msg.eml --format md
+```
+
+> `audit` 当前只审计**单封邮件**（`.eml`）。`.mbox` / Maildir 容器与
+> `--container` / `--mbox-variant` 自里程碑 M5 起支持；此刻传目录会得到 exit 1
+> 并明确说明"容器层自 M5 起支持"。
 
 **退出码**（`data/README.md` §7.9 是唯一定义）：
 
@@ -111,15 +129,16 @@ TNEF / `winmail.dat` 专向、钓鱼 / URL / 内容安全分析、`.eml` 查看�
 | --- | --- | --- |
 | M0 | 计划套件 + 方法论装订 + 可运行骨架 | ✅ 完成 |
 | M1 | 数据先行（机读台账 + golden 语料生成器 + 51 case 语料） | ✅ 完成 |
-| M2 | 树与边界（MC-B） | ⬜ 未开始 |
+| M2 | 树与边界（MC-B） | ✅ 完成 |
 | M3 | 头编码（MC-H） | ⬜ 未开始 |
 | M4 | 传输编码（MC-T） | ⬜ 未开始 |
 | M5 | 归属与容器（MC-A / MC-C） | ⬜ 未开始 |
 | M6 | 发布 | ⬜ 未开始 |
 
 > 本表与 `plan/00`、`plan/05` 逐字一致，由 `tools/check_sprint_layout.py` 断言。
-> 当前是 **M0 骨架**：`audit` 会显式报"规则引擎尚未实现"并 **exit 1**——
-> 骨架期绝不把"没实现"读成"干净"。
+> 当前 **M2 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B 系列），
+> 退出码 0/2/3 均为审计结论。M3–M5 的四个模块（`headers` / `transfer` / `attribution` /
+> `container`）**仍未实现**，调用即抛 `EngineNotReady` → exit 1——**未实现 ≠ 干净**。
 
 ---
 

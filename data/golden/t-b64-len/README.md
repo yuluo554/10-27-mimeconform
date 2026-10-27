@@ -4,6 +4,7 @@
 - 来源：SO 6029218——原话：sending zip as base64-encoded attachment corrupts archive
 - 输入：`msg.eml`（254 bytes；sha256 `4a7dd2c4b6f30f4c8fedbb0608c2a4ec81346d31f9b162240b18b52fd1815897`）
 - 期望指纹：`50164db2313ad6b1695faebd8fbde13d638075a8787f64cc7e2a8b4faf07264a`
+- 树指纹：`2ddc6b0d6b01d893e4b5e0a062a5ca268c01171bdc978fceef8f4c61046a3018`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/t-b64-len/msg.eml`

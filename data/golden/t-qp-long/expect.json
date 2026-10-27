@@ -22,6 +22,6 @@
     }
   ],
   "fingerprint": "fc55c636cad93403ff8d49f0c4f9f03575c8584fd11a24cb1a2f40baeffd25d6",
-  "tree_digest": null,
+  "tree_digest": "ed274d2dcf499ba93a88d3eccdd17fa368f9ac4d40e92a78b945d0580ae36573",
   "note": "R8 \u5168\u5f55\u539f\u53e5\uff1aencoded lines be no more than 76 characters long\u3002\u884c\u5bbd\u6309 octets\u3001\u4e0d\u542b CRLF\u3002"
 }

@@ -4,6 +4,7 @@
 - 来源：自造边界样本（无外部来源）
 - 输入：`msg.eml`（2481 bytes；sha256 `38e9445715cb35ec0652fbdc435159b19f8d8f4bd5287af18fadbfb19aeb9bf5`）
 - 期望指纹：`86284bc0456a1eca097d6a4f9eaa513c3ae937572fc030723ff3a430861f3ed2`
+- 树指纹：`868f6be6beb363f8c1d2ed67413b7dc124c6f9824d09c2bc9234e94faeb5c414`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/b-deep-nest/msg.eml`

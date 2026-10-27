@@ -4,6 +4,7 @@
 - 来源：自造头编码样本（无外部来源）
 - 输入：`msg.eml`（411 bytes；sha256 `c41598ca206c9a939dd8d6a8e94c573f426bc99b5c2aae527cae67ab8d1d3508`）
 - 期望指纹：`ef5c4b525d4c94c60b86837ea50f4db89757d68b27f1861c3dc29b78e9413e87`
+- 树指纹：`37957cc07bae4f8dbf256fb609168f1a646464e9766f566510520213b67a0ba8`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/h-2231-pct/msg.eml`

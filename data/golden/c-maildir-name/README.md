@@ -4,6 +4,7 @@
 - 来源：自造容器样本（无外部来源）
 - 输入：`maildir/cur/1700000000-bad-name`（150 bytes；sha256 `99bbbd6af7333d9dba3f121e4b698b52a7c70a84a240e951676c21663733bdde`）
 - 期望指纹：`670b37f306e66c3b72a51036f5dc8b8623a9503290eb08b6c5bcb620ecc2311b`
+- 树指纹：`None`（容器输入，自 M5 起回填）
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/c-maildir-name/maildir/cur/1700000000-bad-name`

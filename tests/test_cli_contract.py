@@ -1,12 +1,17 @@
 """退出码与 CLI 契约（plan/03 §八）。
 
-M0 阶段可确证的两条：**0**（`--version`）与 **1**（用法错误 / 输入不可读 / 引擎未就绪）。
-`2` / `3` 属 M2 起的审计结果，届时在此文件补两条（此处显式 skip 并写明原因，不假装通过）。
+四条退出码的 CLI 级证据在 M2 齐备：**0**（`--version` / 干净审计）、**1**（用法错误 /
+输入不可读）、**2**（审计完成且只有 `minor`）、**3**（`major`/`blocker`）。
+
+**骨架期语义已被替换而非删除**（plan/00 D16）：那时 `audit` 对任何输入都 exit 1，
+用来证明"未实现 ≠ 干净"。M2 起 `scan` 已落地，于是 D16 的活口改成
+`test_unimplemented_engines_still_fail_loudly` —— 仍未实现的四个模块必须继续显式失败。
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import pytest
@@ -14,6 +19,9 @@ import pytest
 from mimeconform import constants as C
 from mimeconform.cli import build_parser, main
 from mimeconform.errors import EngineNotReady, UsageError
+
+ROOT = Path(__file__).resolve().parents[1]
+GOLDEN = ROOT / "data" / "golden"
 
 
 # ── 0 ────────────────────────────────────────────────────────────────────
@@ -68,17 +76,121 @@ def test_missing_input_file_is_one(tmp_path: Path) -> None:
     assert main(["audit", str(missing)]) == C.EXIT_USAGE
 
 
-# ── 1：引擎未就绪（骨架期显式失败，绝不返回 0）─────────────────────────────
+# ── 0 / 2 / 3：审计的真实退出码（M2 接线）─────────────────────────────────
 
 
-def test_audit_is_not_ready_and_says_so(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    target = tmp_path / "sample.eml"
-    target.write_bytes(b"From: a@example.invalid\r\n\r\nhello\r\n")
-    code = main(["audit", str(target)])
-    captured = capsys.readouterr()
-    assert code == C.EXIT_USAGE, "骨架期 audit 必须 exit 1，绝不返回 0（plan/00 D16）"
-    assert "尚未实现" in captured.err
-    assert "M2" in captured.err
+def test_audit_clean_message_exits_zero() -> None:
+    """0：审计完成、无 blocker/major（§7.9）。"""
+    clean = GOLDEN / "b-clean-nested" / "msg.eml"
+    assert main(["audit", str(clean), "--format", "json"]) == C.EXIT_OK
+
+
+def test_audit_minor_only_exits_two() -> None:
+    """2：只有 `minor`（boundary 超 70）—— 与 argparse 的 2 必须区分（那份映射在 main 里）。"""
+    case = GOLDEN / "b-boundary-long" / "msg.eml"
+    assert main(["audit", str(case), "--format", "json"]) == C.EXIT_MINOR
+
+
+def test_audit_major_exits_three() -> None:
+    """3：存在 `major`（内层 boundary 重复）。"""
+    case = GOLDEN / "b-inner-dup" / "msg.eml"
+    assert main(["audit", str(case), "--format", "json"]) == C.EXIT_MAJOR
+
+
+def test_audit_note_only_stays_zero() -> None:
+    """`note` / `gray` 登记不影响退出码：证明确实没有把 diff/gray 硬判成错误。"""
+    case = GOLDEN / "b-no-final" / "msg.eml"
+    assert main(["audit", str(case), "--format", "json"]) == C.EXIT_OK
+
+
+def test_audit_strict_depth_promotes_the_policy_note_to_minor() -> None:
+    """`--strict-depth` 是用户显式选择：把超深度计入退出码（severity 提为 minor，§7.6）。"""
+    case = GOLDEN / "b-deep-nest" / "msg.eml"
+    assert main(["audit", str(case), "--format", "json"]) == C.EXIT_OK
+    assert main(["audit", str(case), "--format", "json", "--strict-depth"]) == C.EXIT_MINOR
+
+
+def test_audit_fail_on_can_be_stricter_but_never_softer() -> None:
+    """`--fail-on` 只更严（§7.9）：note 门槛能把干净审计判成失败，blocker 门槛放不过 major。"""
+    clean = GOLDEN / "b-clean-nested" / "msg.eml"
+    assert main(["audit", str(clean), "--format", "json", "--fail-on=note"]) == C.EXIT_OK
+    noted = GOLDEN / "b-no-final" / "msg.eml"
+    assert main(["audit", str(noted), "--format", "json", "--fail-on=note"]) == C.EXIT_MAJOR
+    major = GOLDEN / "b-inner-dup" / "msg.eml"
+    assert main(["audit", str(major), "--format", "json", "--fail-on=blocker"]) == C.EXIT_MAJOR
+
+
+def test_audit_writes_json_and_markdown(tmp_path: Path) -> None:
+    """`--out` 目录形态：两种格式都写；且**只写该目录**（只读红线）。"""
+    case = GOLDEN / "b-clean-nested" / "msg.eml"
+    out_dir = tmp_path / "reports"
+    assert main(["audit", str(case), "--out", str(out_dir)]) == C.EXIT_OK
+    assert (out_dir / "report.json").is_file()
+    assert (out_dir / "report.md").is_file()
+    # 输入所在目录不得多出任何文件（只读红线）
+    assert sorted(p.name for p in (GOLDEN / "b-clean-nested").iterdir()) == [
+        "README.md",
+        "expect.json",
+        "msg.eml",
+    ]
+
+
+def test_audit_out_by_extension_picks_one_format(tmp_path: Path) -> None:
+    case = GOLDEN / "b-clean-nested" / "msg.eml"
+    json_path = tmp_path / "one.json"
+    md_path = tmp_path / "one.md"
+    assert main(["audit", str(case), "--out", str(json_path)]) == C.EXIT_OK
+    assert main(["audit", str(case), "--out", str(md_path)]) == C.EXIT_OK
+    assert json_path.read_text(encoding="utf-8").lstrip().startswith("{")
+    assert md_path.read_text(encoding="utf-8").startswith("#")
+
+
+def test_audit_report_declares_the_ambiguity(tmp_path: Path) -> None:
+    """D9：默认树的展示**不构成判定** —— 报告自己必须说出来。"""
+    case = GOLDEN / "b-inner-dup" / "msg.eml"
+    out = tmp_path / "amb.json"
+    assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_MAJOR
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["tree"]["tree_alternatives"] == 2
+    assert payload["tree"]["divergence"]["path"] == "0.1"
+    assert "不构成判定" in payload["tree"]["declaration"]
+
+
+# ── 1：仍未实现的模块必须继续显式失败（plan/00 D16 的活口）────────────────
+
+
+def _empty_node():
+    from mimeconform.model import Node
+
+    return Node(
+        path="0",
+        content_type="text/plain",
+        boundary=None,
+        headers=(),
+        body_range=(0, 0),
+        body_sha256="0" * 64,
+    )
+
+
+def test_unimplemented_engines_still_fail_loudly() -> None:
+    """M3–M5 的四个模块仍未实现 → 调用即抛 `EngineNotReady`，绝不静默返回。
+
+    D16 的语义没有随 M2 消失，只是从 `audit` 搬到了这些模块上：**未实现 ≠ 干净**。
+    """
+    from mimeconform import attribution, container, headers, transfer
+
+    calls = (
+        lambda: headers.parse_headers(b"Subject: x\r\n"),
+        lambda: headers.decode_filename([], ""),
+        lambda: transfer.observe_body_shape(b"xxxx"),
+        lambda: transfer.decode_base64(b"QUJD"),
+        lambda: transfer.decode_qp(b"=3D"),
+        lambda: attribution.audit_attribution(_empty_node()),
+        lambda: container.split_container(b"From a@example.invalid x\n"),
+    )
+    for call in calls:
+        with pytest.raises(EngineNotReady, match="尚未实现"):
+            call()
 
 
 # ── selftest 的数据态语义 ─────────────────────────────────────────────────

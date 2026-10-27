@@ -296,17 +296,111 @@ def _read_input(path: Path) -> bytes:
         raise InputError(f"无法按字节读取 {path}: {exc}") from exc
 
 
+def _engine_available() -> bool:
+    """引擎是否已落地（`scan_message` 不再抛 `EngineNotReady` 即为真）。
+
+    M2 起 `scan.py` 已实现，本函数恒为真；保留它是因为**报告路径只在这一处汇总**
+    —— 将来再加模块（M3–M5）时，接线点仍然只有 `_run_audit` 一个。
+    """
+    return True
+
+
+def _tree_info(result: object) -> dict[str, object]:
+    """把 `ScanResult` 的**结构事实**整理成报告字段（不判定，只搬运）。"""
+    from .scan import AMBIGUITY_NOTE
+
+    tree_alternatives = getattr(result, "tree_alternatives", ())
+    divergence = getattr(result, "divergence", None)
+    facts = getattr(result, "facts", {}) or {}
+    info: dict[str, object] = {
+        "mode": facts.get("mode", "inner-first"),
+        "node_count": facts.get("node_count", 1),
+        "max_depth": facts.get("max_depth"),
+        "tree_alternatives": len(tree_alternatives),
+        "truncated_paths": list(facts.get("truncated_paths", ())),
+    }
+    if divergence is not None:
+        info["divergence"] = {
+            "path": divergence.path,
+            "offset": divergence.offset,
+            "note": divergence.note,
+        }
+        # plan/00 D9：默认展示不构成判定 —— 报告必须自己说出来，不能只在文档里写。
+        info["declaration"] = "默认展示的树不构成判定；" + AMBIGUITY_NOTE
+    return info
+
+
+def _render(result: object, *, input_name: str, data: bytes, exit_code: int) -> tuple[str, str]:
+    """同一份台账 → (JSON, Markdown)。两条产物同源（plan/02 §七）。"""
+    from .ledger import build
+    from .report import render_json, render_markdown
+
+    defects = tuple(getattr(result, "defects", ()))
+    root = getattr(result, "root", None)
+    ledger = build(defects, root)
+    kwargs = dict(
+        input_name=input_name,
+        input_bytes=len(data),
+        input_sha256=hashlib.sha256(data).hexdigest(),
+        exit_code=exit_code,
+        tree_info=_tree_info(result),
+    )
+    return render_json(ledger, **kwargs), render_markdown(ledger, **kwargs)
+
+
+def _write_outputs(args: argparse.Namespace, json_text: str, md_text: str) -> None:
+    """把产物写到 `--out` 或 stdout。
+
+    `--out` 的三种形态（`plan/03` §八）：
+    * 以 ``.json`` 结尾 → 只写 JSON；
+    * 以 ``.md`` 结尾 → 只写 Markdown；
+    * 其余按**目录**处理 → 按 ``--format`` 写 ``report.json`` / ``report.md``。
+
+    **只写指定路径**：绝不写输入所在目录（只读红线，`plan/00` §六.5）。
+    """
+    out = args.out
+    if out is None:
+        if args.format in {"json", "both"}:
+            sys.stdout.write(json_text)
+        if args.format in {"md", "both"}:
+            sys.stdout.write(md_text)
+        return
+
+    target = Path(out)
+    suffix = target.suffix.lower()
+    try:
+        if suffix == ".json":
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json_text, encoding="utf-8")
+            return
+        if suffix in {".md", ".markdown"}:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(md_text, encoding="utf-8")
+            return
+        target.mkdir(parents=True, exist_ok=True)
+        if args.format in {"json", "both"}:
+            (target / "report.json").write_text(json_text, encoding="utf-8")
+        if args.format in {"md", "both"}:
+            (target / "report.md").write_text(md_text, encoding="utf-8")
+    except OSError as exc:
+        raise InputError(f"无法写入 {target}: {exc}") from exc
+
+
 def _run_audit(args: argparse.Namespace) -> int:
     path = Path(args.path)
     data = _read_input(path)
 
-    # 骨架期：引擎未就绪 → 显式失败（exit 1），绝不返回 0。
+    if not _engine_available():  # pragma: no cover - M2 起恒真
+        from ._pending import _not_ready
+
+        raise _not_ready("scan_message")
+
     from .scan import scan_message
 
-    scan_message(data, max_depth=args.max_depth)  # 引擎落地后这里返回 ScanResult
-    # 以下为 M2 起的接线；骨架期不可达。
-    ledger_defects: tuple[object, ...] = ()
-    exit_code = decide_exit_code(ledger_defects, fail_on=args.fail_on)  # type: ignore[arg-type]
+    result = scan_message(data, max_depth=args.max_depth, strict_depth=args.strict_depth)
+    exit_code = decide_exit_code(result.defects, fail_on=args.fail_on)
+    json_text, md_text = _render(result, input_name=path.name, data=data, exit_code=exit_code)
+    _write_outputs(args, json_text, md_text)
     return exit_code
 
 

@@ -5,18 +5,26 @@ M0 可测的部分（渲染层与序列化）：
 * `render_json` / `render_markdown` 两次 → 相同；
 * 不含时钟 / 绝对路径 / 主机名（AST 守门另有专测，此处验**产物字节**）。
 
-M2 起补"同一 `.eml` 双跑账本 `cmp` 一致"（届时追加到本文件）。
+M2 起补的**引擎层**双跑：`data/golden/**/*.eml` 逐个跑两遍 `scan_message` → `ledger.build`
+→ `dumps`，两份字节必须逐字节一致（这是"结构指纹可作回归基线"的前提）。
 """
 
 from __future__ import annotations
 
 import json
 import re
+from pathlib import Path
+
+import pytest
 
 from mimeconform import constants as C
 from mimeconform.ledger import build, dumps
 from mimeconform.model import Defect
 from mimeconform.report import render_json, render_markdown
+
+ROOT = Path(__file__).resolve().parents[1]
+#: 单封邮件输入（容器输入由 M5 的扫描入口负责，届时另补一组）。
+EML_INPUTS = sorted((ROOT / "data" / "golden").glob("*/*.eml"))
 
 
 def sample_ledger() -> dict[str, object]:
@@ -127,3 +135,35 @@ def test_json_uses_ascii_escapes_for_non_ascii() -> None:
     text = dumps(ledger)
     assert "\\u" in text
     assert "附件名" not in text
+
+
+# ── 引擎层双跑（M2 起）───────────────────────────────────────────────────
+
+
+def _engine_ledger_bytes(path: Path) -> bytes:
+    """跑完整链路（扫描 → 台账 → 序列化）并返回产物字节。"""
+    from mimeconform.scan import scan_message
+
+    data = path.read_bytes()
+    result = scan_message(data)
+    ledger = build(result.defects, result.root)
+    return dumps(ledger).encode("utf-8")
+
+
+def test_eml_corpus_exposes_a_nonempty_denominator() -> None:
+    """非空跑自证：没有 `.eml` 输入时下面的判据是空转的。"""
+    assert len(EML_INPUTS) >= 40, f"只扫到 {len(EML_INPUTS)} 个 .eml 输入"
+
+
+@pytest.mark.parametrize("path", EML_INPUTS, ids=lambda p: p.parent.name)
+def test_engine_double_run_is_byte_identical(path: Path) -> None:
+    """同一输入双跑 → 账本字节逐字节一致（plan/05 §二 M2 DoD）。"""
+    assert _engine_ledger_bytes(path) == _engine_ledger_bytes(path)
+
+
+def test_engine_output_has_no_environment_fingerprints() -> None:
+    """引擎产物同样不得出现时间戳 / 盘符路径 / 主机名（确定性设计）。"""
+    text = _engine_ledger_bytes(ROOT / "data" / "golden" / "b-inner-dup" / "msg.eml").decode("utf-8")
+    assert not re.search(r"\b20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}", text), "产物里出现了时间戳"
+    assert not re.search(r"\b[A-Za-z]:[\\/]", text), "产物里出现了盘符绝对路径"
+    assert "Users" not in text

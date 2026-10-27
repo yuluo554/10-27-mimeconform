@@ -4,6 +4,7 @@
 - 来源：SO 39328935——原话：Why doesn't my embedded image display in Gmail or Office 365?
 - 输入：`msg.eml`（594 bytes；sha256 `e6b5d3ea3a7c77d47f7d2a79d3ab03d5bcd77d084e735b76d7787ee705db0ad0`）
 - 期望指纹：`ba7b1bc3fb4b969aaacfd64538d4de35f05c10444591ef4ac85aeed53dd4e0da`
+- 树指纹：`4487d21d4abd8423ee3dadc3496b8c69aecb84a13c3cb00da99698a1ab86f8bc`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/a-related-start/msg.eml`

@@ -4,6 +4,7 @@
 - 来源：SO 24246391——原话：message-text always goes into attachment
 - 输入：`msg.eml`（444 bytes；sha256 `5fb66303d2d3b45665a3e72a1b297e4851bbb46a49b6177a536d7f79ac1d3a8d`）
 - 期望指纹：`2e0973cb57f64c7429d53d6284b7f16535161e84afa09781bf9555e5ff02c643`
+- 树指纹：`ee7ab2ee78417c5c1c6b52a44f59c28610de6a8ea5b451a1bda0bea873e910d4`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/a-no-disposition/msg.eml`

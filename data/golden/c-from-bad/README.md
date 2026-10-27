@@ -4,6 +4,7 @@
 - 来源：cpython #93376（open）—— issue 原话：mailbox.mbox malformed From lines not being detected/handled
 - 输入：`mail.mbox`（366 bytes；sha256 `b368d57224ca1f7013462161b5e300720dd56eb2858871a48ba26955da03e999`）
 - 期望指纹：`2d574621be2fd2828bfd8ba1af403085693166ed127b7f16a39794763d2b5615`
+- 树指纹：`None`（容器输入，自 M5 起回填）
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/c-from-bad/mail.mbox`

@@ -4,6 +4,7 @@
 - 来源：SO 12816042——原话：PDF attachment is called Noname（缺 filename 参数）
 - 输入：`msg.eml`（410 bytes；sha256 `7122503588005159dc390264719a3f15db328921e6b568ea02c4b15c779283d9`）
 - 期望指纹：`fc16c0b18624d381bf0c944a599250068ac07c8920a9d54611a1abc6d3d6f724`
+- 树指纹：`5a123b34fc028d734bdd1604aca5cf6b15e11d908dae499a8fd2a407c53cd74d`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/a-noname/msg.eml`

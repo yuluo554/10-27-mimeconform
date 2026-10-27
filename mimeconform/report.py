@@ -29,6 +29,28 @@ def _header_lines(input_name: str, input_bytes: int, input_sha256: str, exit_cod
     ]
 
 
+def _tree_section(tree_info: dict[str, object]) -> list[str]:
+    """结构事实小节的排版（**只搬运**：所有值都来自 ``tree_info``）。"""
+    lines = ["## 结构事实", ""]
+    lines.append(f"- 展示树语义: `{tree_info.get('mode')}`")
+    lines.append(f"- 节点数: {tree_info.get('node_count')}")
+    lines.append(f"- 候选树数量: {tree_info.get('tree_alternatives')}")
+    divergence = tree_info.get("divergence")
+    if isinstance(divergence, dict):
+        lines.append(
+            f"- 分歧位置: path `{divergence.get('path')}` @ offset {divergence.get('offset')}"
+        )
+        lines.append(f"- 分歧说明: {divergence.get('note')}")
+    declaration = tree_info.get("declaration")
+    if declaration:
+        lines.append(f"- 声明: {declaration}")
+    truncated = tree_info.get("truncated_paths")
+    if isinstance(truncated, list) and truncated:
+        lines.append(f"- 超深度停止下钻的路径: {', '.join(f'`{p}`' for p in truncated)}")
+    lines.append("")
+    return lines
+
+
 def render_json(
     ledger: dict[str, object],
     *,
@@ -36,9 +58,14 @@ def render_json(
     input_bytes: int,
     input_sha256: str,
     exit_code: int,
+    tree_info: dict[str, object] | None = None,
 ) -> str:
-    """机读产物：与 MD 共用同一个 ``ledger``，没有任何额外判定。"""
-    payload = {
+    """机读产物：与 MD 共用同一个 ``ledger``，没有任何额外判定。
+
+    ``tree_info`` 是**引擎已经算好**的结构事实（候选树数量 / 分歧位置 / 截断路径），
+    本函数只做搬运与排版 —— 不重算、不判定（AST 守门 ``test_report_is_pure``）。
+    """
+    payload: dict[str, object] = {
         "tool": {"name": "mimeconform", "version": __version__},
         "input": {
             "name": input_name,
@@ -57,6 +84,8 @@ def render_json(
         "defects": ledger["defects"],
         "disclaimers": list(_DISCLAIMERS),
     }
+    if tree_info is not None:
+        payload["tree"] = tree_info
     return dumps(payload)
 
 
@@ -67,6 +96,7 @@ def render_markdown(
     input_bytes: int,
     input_sha256: str,
     exit_code: int,
+    tree_info: dict[str, object] | None = None,
 ) -> str:
     """人读产物：同一 ``ledger``，只换排版。"""
     lines: list[str] = []
@@ -91,6 +121,9 @@ def render_markdown(
     lines.append(f"- 缺陷集指纹: `{ledger['fingerprint']}`")
     lines.append(f"- 树指纹: `{ledger['tree_digest']}`")
     lines.append("")
+
+    if tree_info is not None:
+        lines.extend(_tree_section(tree_info))
 
     lines.append("## 缺陷明细")
     lines.append("")

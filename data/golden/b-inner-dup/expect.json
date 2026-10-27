@@ -26,7 +26,7 @@
     "divergence_path": "0.1"
   },
   "fingerprint": "852f6f859643edd119a8c89f64402b8d6703b9102bd863da8234f6ea454c0e12",
-  "tree_digest": null,
+  "tree_digest": "a6a8a93a2dce26c743e91564cbc9ed58db3e515f668c94e70d1fcd47efd3081d",
   "stdlib_compare": {
     "defects": 1,
     "types": [

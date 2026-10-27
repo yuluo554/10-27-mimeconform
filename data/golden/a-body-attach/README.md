@@ -4,6 +4,7 @@
 - 来源：SO 6255202——原话：when someone sends an email with a text attachment, the contents of the text file shows up for the body variable
 - 输入：`msg.eml`（454 bytes；sha256 `ee5549c76c0bd138f9c9d009b8a15eadabac4b12d3e311b53aa38ceb25c675c1`）
 - 期望指纹：`a21cae8b14afdd636c4d6a658c27c1e2e16bf01626efb64f1c7bb95b223e1518`
+- 树指纹：`8c8b46e6da623736fe4e3af27c2290f5f308430da2340f9d425f3c35474fe989`
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/a-body-attach/msg.eml`
