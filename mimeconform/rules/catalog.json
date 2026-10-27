@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "note": "机读规则目录（plan/03 §九）。判据与门禁在 mimeconform/rules/__init__.py：每条 ledger_key 必须能在 data/rfc-ledger.json 解析出逐字原句，否则 class 只能是 diff/gray 且 severity 只能是 note。MC-B0x 的五字段与 scan._RULE_META 逐值一致，MC-H0x/1x 与 headers._RULE_META 逐值一致（tests/test_catalog_consistency.py 断言）。detector 指向**发出该规则号的函数**，tests/test_catalog_consistency.py 断言它真能在 module 里解析到。",
+  "rules": [
+    {
+      "rule_id": "MC-B01",
+      "module": "scan",
+      "klass": "hard",
+      "severity": "blocker",
+      "rfc": "RFC 2046 §5.1.1",
+      "ledger_key": "RFC2046-5.1.1#boundary-required",
+      "detector": "scan._Scanner._build_node",
+      "summary": "multipart/* 缺少 boundary 参数（结构性缺陷，树无法建立）"
+    },
+    {
+      "rule_id": "MC-B02",
+      "module": "scan",
+      "klass": "hard",
+      "severity": "minor",
+      "rfc": "RFC 2046 §5.1.1",
+      "ledger_key": "RFC2046-5.1.1#boundary-max-70",
+      "detector": "scan._Scanner._build_node",
+      "summary": "boundary 长度 > 70 字符（不含前导两个连字符）"
+    },
+    {
+      "rule_id": "MC-B03",
+      "module": "scan",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2046 §5.1.1",
+      "ledger_key": "RFC2046-5.1.1#delimiter-at-line-start",
+      "detector": "scan._Scanner._parse_multipart_region",
+      "summary": "疑似 delimiter 未出现在行首（该子项原句未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-B04",
+      "module": "scan",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2046 §5.1.1",
+      "ledger_key": "RFC2046-5.1.1#close-delimiter-form",
+      "detector": "scan._Scanner._parse_multipart_region",
+      "summary": "close-delimiter 形态错误（该子项原句未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-B05",
+      "module": "scan",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "scan._Scanner._parse_multipart_region",
+      "summary": "缺 final boundary（RFC 无恢复规程；报告给被迫闭合的字节位置）"
+    },
+    {
+      "rule_id": "MC-B06",
+      "module": "scan",
+      "klass": "hard",
+      "severity": "major",
+      "rfc": "RFC 2046 §5.1.1/§5.1.2",
+      "ledger_key": "RFC2046-5.1.2#nested-boundary-distinct",
+      "detector": "scan._Scanner._build_node",
+      "summary": "内层 multipart 复用了外层 boundary（附两棵候选树 + 分歧位置）"
+    },
+    {
+      "rule_id": "MC-B07",
+      "module": "scan",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2046 §5.1.1",
+      "ledger_key": "RFC2046-5.1.1#preamble-epilogue-ignored",
+      "detector": "scan._Scanner._parse_multipart_region",
+      "summary": "multipart 存在 preamble（该子项原句未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-B08",
+      "module": "scan",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2046 §5.1.1",
+      "ledger_key": "RFC2046-5.1.1#preamble-epilogue-ignored",
+      "detector": "scan._Scanner._parse_multipart_region",
+      "summary": "multipart 存在 epilogue（该子项原句未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-B09",
+      "module": "scan",
+      "klass": "gray",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "scan._Scanner._parse_part",
+      "summary": "嵌套深度 > --max-depth（RFC 未规定深度上限；策略项，--strict-depth 才计入退出码）"
+    },
+    {
+      "rule_id": "MC-B10",
+      "module": "scan",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "scan._Scanner._parse_multipart_region",
+      "summary": "multipart 无任何 body part（无明文条款，只由标准库的实现事实支撑 → 只登记）"
+    },
+    {
+      "rule_id": "MC-H01",
+      "module": "headers",
+      "klass": "hard",
+      "severity": "minor",
+      "rfc": "RFC 2047 §2",
+      "ledger_key": "RFC2047-2#ew-length-75",
+      "detector": "headers.parse_headers",
+      "summary": "encoded-word 长度 > 75（含 charset / encoding / encoded-text 与分隔符，按字节计）"
+    },
+    {
+      "rule_id": "MC-H02",
+      "module": "headers",
+      "klass": "hard",
+      "severity": "minor",
+      "rfc": "RFC 2047 §2",
+      "ledger_key": "RFC2047-2#header-line-76",
+      "detector": "headers.parse_headers",
+      "summary": "含 encoded-word 的头行 > 76 字符"
+    },
+    {
+      "rule_id": "MC-H03",
+      "module": "headers",
+      "klass": "hard",
+      "severity": "minor",
+      "rfc": "RFC 2047 §2",
+      "ledger_key": "RFC2047-2#ew-inner-space-forbidden",
+      "detector": "headers.parse_headers",
+      "summary": "encoded-word 内部出现空白（非折行；折行情形由 MC-H12 独占）"
+    },
+    {
+      "rule_id": "MC-H04",
+      "module": "headers",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2047 §4.1",
+      "ledger_key": "RFC2047-4.1#q-encoding-syntax",
+      "detector": "headers.parse_headers",
+      "summary": "Q 编码语法非法（=HH 不成立；该子项原句未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-H05",
+      "module": "headers",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2047 §4.2",
+      "ledger_key": "RFC2047-4.2#b-encoding-length-4",
+      "detector": "headers.parse_headers",
+      "summary": "B 编码 base64 长度非 4 的倍数（该子项原句未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-H06",
+      "module": "headers",
+      "klass": "hard",
+      "severity": "major",
+      "rfc": "RFC 2047 §5",
+      "ledger_key": "RFC2047-5#no-continuation-across-ew",
+      "detector": "headers.parse_headers",
+      "summary": "encoded-text 跨 encoded-word 续写（前一段自身不完整、拼接后才完整）"
+    },
+    {
+      "rule_id": "MC-H07",
+      "module": "headers",
+      "klass": "hard",
+      "severity": "major",
+      "rfc": "RFC 5322 §2.1.1",
+      "ledger_key": "RFC5322-2.1.1#line-max-998",
+      "detector": "headers.parse_headers",
+      "summary": "头行 > 998 octets（不含 CRLF；先于 encoded-word 检查）"
+    },
+    {
+      "rule_id": "MC-H08",
+      "module": "headers",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "headers.parse_headers",
+      "summary": "头值含未编码的非 ASCII 字节（RFC 2047 是编码机制，不是禁令）"
+    },
+    {
+      "rule_id": "MC-H09",
+      "module": "headers",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2231 §3",
+      "ledger_key": "RFC2231-3#param-continuation-numbering",
+      "detector": "headers.parse_headers",
+      "summary": "RFC 2231 续行编号缺 *0 / 前导零 / 跳号（R10 未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-H10",
+      "module": "headers",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2231 §4",
+      "ledger_key": "RFC2231-4#charset-language-quotes",
+      "detector": "headers.parse_headers",
+      "summary": "charset'language'value 的单引号不完整（R10 未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-H11",
+      "module": "headers",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2231 §4.1",
+      "ledger_key": "RFC2231-4.1#percent-escape",
+      "detector": "headers.parse_headers",
+      "summary": "%HH 转义非法（R10 未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-H12",
+      "module": "headers",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "headers.parse_headers",
+      "summary": "encoded-word 内部含折行（折叠与解码顺序 RFC 未定；命中则 MC-H03 进 related）"
+    }
+  ]
+}

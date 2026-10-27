@@ -305,6 +305,18 @@ def _engine_available() -> bool:
     return True
 
 
+#: 本轮 `audit` 真正跑过的引擎层（顺序 = 报告里的展示顺序）。
+#: **加模块必须同改这里**，否则报告会把"没查"说成"查过"（`tests/test_cli_contract.py` 断言）。
+_AUDITED_ENGINES: tuple[str, ...] = ("scan", "headers")
+
+#: 仍未接入 `audit` 的引擎层（M4 / M5）。它们仍是 `EngineNotReady`。
+_NOT_YET_AUDITED: tuple[str, ...] = ("transfer", "attribution", "container")
+
+
+def _audited_engines() -> tuple[str, ...]:
+    return _AUDITED_ENGINES
+
+
 def _tree_info(result: object) -> dict[str, object]:
     """把 `ScanResult` 的**结构事实**整理成报告字段（不判定，只搬运）。"""
     from .scan import AMBIGUITY_NOTE
@@ -318,6 +330,10 @@ def _tree_info(result: object) -> dict[str, object]:
         "max_depth": facts.get("max_depth"),
         "tree_alternatives": len(tree_alternatives),
         "truncated_paths": list(facts.get("truncated_paths", ())),
+        # 覆盖面声明（M3）：报告必须自己说清"这轮审计了哪几层"——
+        # 否则一份干净的账本会被读成"全模块都查过了"。加模块时同改 `_audited_engines`。
+        "audited_engines": list(_audited_engines()),
+        "not_yet_audited": list(_NOT_YET_AUDITED),
     }
     if divergence is not None:
         info["divergence"] = {
@@ -330,12 +346,11 @@ def _tree_info(result: object) -> dict[str, object]:
     return info
 
 
-def _render(result: object, *, input_name: str, data: bytes, exit_code: int) -> tuple[str, str]:
+def _render(result: object, defects: tuple, *, input_name: str, data: bytes, exit_code: int) -> tuple[str, str]:
     """同一份台账 → (JSON, Markdown)。两条产物同源（plan/02 §七）。"""
     from .ledger import build
     from .report import render_json, render_markdown
 
-    defects = tuple(getattr(result, "defects", ()))
     root = getattr(result, "root", None)
     ledger = build(defects, root)
     kwargs = dict(
@@ -386,6 +401,21 @@ def _write_outputs(args: argparse.Namespace, json_text: str, md_text: str) -> No
         raise InputError(f"无法写入 {target}: {exc}") from exc
 
 
+def _audit(data: bytes, args: argparse.Namespace):
+    """跑本轮已落地的全部引擎面，返回 ``(ScanResult-like, 合并后的缺陷元组)``。
+
+    **接线点只有这一处**（`plan/03` §八）：每棒把新落地的模块加进这里，别处不改。
+    M2 = `scan`（树与边界）；M3 = `headers`（头编码）；M4 = `transfer`；M5 = `attribution`/`container`。
+    """
+    from .headers import audit_headers
+    from .scan import scan_message
+
+    result = scan_message(data, max_depth=args.max_depth, strict_depth=args.strict_depth)
+    header_defects = audit_headers(result.root, data)
+    combined = tuple(sorted(result.defects + header_defects, key=lambda item: item.sort_key))
+    return result, combined
+
+
 def _run_audit(args: argparse.Namespace) -> int:
     path = Path(args.path)
     data = _read_input(path)
@@ -395,11 +425,9 @@ def _run_audit(args: argparse.Namespace) -> int:
 
         raise _not_ready("scan_message")
 
-    from .scan import scan_message
-
-    result = scan_message(data, max_depth=args.max_depth, strict_depth=args.strict_depth)
-    exit_code = decide_exit_code(result.defects, fail_on=args.fail_on)
-    json_text, md_text = _render(result, input_name=path.name, data=data, exit_code=exit_code)
+    result, defects = _audit(data, args)
+    exit_code = decide_exit_code(defects, fail_on=args.fail_on)
+    json_text, md_text = _render(result, defects, input_name=path.name, data=data, exit_code=exit_code)
     _write_outputs(args, json_text, md_text)
     return exit_code
 

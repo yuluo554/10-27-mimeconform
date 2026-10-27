@@ -141,12 +141,14 @@ def test_json_uses_ascii_escapes_for_non_ascii() -> None:
 
 
 def _engine_ledger_bytes(path: Path) -> bytes:
-    """跑完整链路（扫描 → 台账 → 序列化）并返回产物字节。"""
+    """跑完整链路（扫描 + 头编码 → 台账 → 序列化）并返回产物字节。"""
+    from mimeconform.headers import audit_headers
     from mimeconform.scan import scan_message
 
     data = path.read_bytes()
     result = scan_message(data)
-    ledger = build(result.defects, result.root)
+    defects = tuple(result.defects) + audit_headers(result.root, data)
+    ledger = build(defects, result.root)
     return dumps(ledger).encode("utf-8")
 
 

@@ -24,6 +24,12 @@ from ..errors import EngineNotReady
 CATALOG_PATH = Path(__file__).with_name("catalog.json")
 LEDGER_PATH = Path(__file__).resolve().parents[2] / "data" / "rfc-ledger.json"
 
+#: "没有条款可引"的哨兵键（`data/README` §7.1 / D8）。
+#: `rfc = none-by-design` 的规则在台账里**故意**没有可解析的节号 —— 那本身就是证据。
+#: 哨兵走与原句门禁同一条判据路径：``verbatim`` 视为 null ⇒ 只能 `diff`/`gray` + `note`，
+#: 因此"无条款"永远拿不到 `hard`（不是靠人记得）。
+NO_CLAUSE_KEY = "none-by-design"
+
 #: `class` 三值 / `severity` 四档的**代码侧来源**只有 `constants`（§7.1 / §7.4）。
 CLASSES: tuple[str, ...] = C.CLASSES
 SEVERITIES: tuple[str, ...] = C.SEVERITIES
@@ -83,7 +89,12 @@ def resolve_verbatim(ledger: dict[str, object], ledger_key: str) -> tuple[bool, 
 
     为什么需要子项粒度：一个节里常常只有一部分有逐字原句（如 §5.1.1 的
     "boundary 必填/≤70 字符"有、而 "delimiter 形态"没有）。按整节判会把后者放行成 `hard`。
+
+    哨兵键 ``none-by-design``（D8）解析成 ``(True, None)``：它**存在**（"没有条款"本身是
+    登记过的证据），但**没有原句** —— 于是走同一条降级判据，拿不到 `hard`。
     """
+    if ledger_key == NO_CLAUSE_KEY:
+        return True, None
     clauses = ledger.get("clauses")
     if not isinstance(clauses, dict):
         raise CatalogError("rfc-ledger.json 必须是 {clauses: {...}} 形态")

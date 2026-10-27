@@ -173,15 +173,15 @@ def _empty_node():
 
 
 def test_unimplemented_engines_still_fail_loudly() -> None:
-    """M3–M5 的四个模块仍未实现 → 调用即抛 `EngineNotReady`，绝不静默返回。
+    """M4–M5 的三个模块仍未实现 → 调用即抛 `EngineNotReady`，绝不静默返回。
 
-    D16 的语义没有随 M2 消失，只是从 `audit` 搬到了这些模块上：**未实现 ≠ 干净**。
+    D16 的语义没有随里程碑消失，只是从 `audit` 搬到了这些模块上：**未实现 ≠ 干净**。
+    M3 起 `headers` 已落地，因此它从这里移出，改由
+    `test_headers_engine_is_wired_into_audit` 正向断言 —— 接线与"仍未实现"是两份证据。
     """
-    from mimeconform import attribution, container, headers, transfer
+    from mimeconform import attribution, container, transfer
 
     calls = (
-        lambda: headers.parse_headers(b"Subject: x\r\n"),
-        lambda: headers.decode_filename([], ""),
         lambda: transfer.observe_body_shape(b"xxxx"),
         lambda: transfer.decode_base64(b"QUJD"),
         lambda: transfer.decode_qp(b"=3D"),
@@ -191,6 +191,40 @@ def test_unimplemented_engines_still_fail_loudly() -> None:
     for call in calls:
         with pytest.raises(EngineNotReady, match="尚未实现"):
             call()
+
+
+def test_headers_engine_is_wired_into_audit(tmp_path: Path) -> None:
+    """M3 的接线证据：`audit` 必须真的跑 `headers`，且报告声明"查了哪几层"。
+
+    为什么单列一条：`headers.parse_headers` 单独可跑，并**不**证明 `audit` 会调用它。
+    这里用 h 簇语料走完整 CLI 路径，再检查报告里的覆盖面字段。
+    """
+    case = GOLDEN / "h-ew-space" / "msg.eml"
+    out = tmp_path / "h.json"
+    assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_MINOR
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert [d["rule_id"] for d in payload["defects"]] == ["MC-H03"], "头编码缺陷必须出现在 report 里"
+    assert payload["tree"]["audited_engines"] == ["scan", "headers"]
+    assert payload["tree"]["not_yet_audited"] == ["transfer", "attribution", "container"]
+
+
+def test_headers_and_tree_defects_share_one_ledger() -> None:
+    """同一封邮件同时有 B 与 H 缺陷时，两者进**同一份**台账（不是各出一份报告）。"""
+    from mimeconform.cli import _audit, build_parser
+    from mimeconform.ledger import build
+
+    data = (
+        b"Subject: =?UTF-8?Q?foo bar?=\r\n"
+        b'Content-Type: multipart/mixed; boundary="b"\r\n'
+        b"\r\n--b\r\n\r\nbody\r\n"
+    )
+    args = build_parser().parse_args(["audit", "x.eml"])
+    _result, defects = _audit(data, args)
+    rules = {defect.rule_id for defect in defects}
+    assert "MC-H03" in rules, f"H 簇缺陷没进台账：{sorted(rules)}"
+    assert "MC-B05" in rules, f"B 簇缺陷也在同一批里：{sorted(rules)}"
+    ledger = build(defects)  # 六元组校验 + 排序 + 指纹一次过
+    assert ledger["count"] == len(defects)
 
 
 # ── selftest 的数据态语义 ─────────────────────────────────────────────────

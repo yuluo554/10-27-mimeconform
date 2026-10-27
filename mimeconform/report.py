@@ -47,6 +47,15 @@ def _tree_section(tree_info: dict[str, object]) -> list[str]:
     truncated = tree_info.get("truncated_paths")
     if isinstance(truncated, list) and truncated:
         lines.append(f"- 超深度停止下钻的路径: {', '.join(f'`{p}`' for p in truncated)}")
+    engines = tree_info.get("audited_engines")
+    if isinstance(engines, list) and engines:
+        # 覆盖面必须自己说出来：一份干净的账本不等于"所有层都查过了"。
+        lines.append(f"- 本轮已审计的引擎层: {', '.join(f'`{name}`' for name in engines)}")
+    pending = tree_info.get("not_yet_audited")
+    if isinstance(pending, list) and pending:
+        lines.append(
+            f"- 尚未接入（其规则**未**参与本次判定）: {', '.join(f'`{name}`' for name in pending)}"
+        )
     lines.append("")
     return lines
 

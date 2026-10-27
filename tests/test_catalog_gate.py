@@ -227,6 +227,46 @@ def test_resolve_verbatim_directly() -> None:
     assert not exists
 
 
+# ── `none-by-design` 哨兵键（M3 落地，`data/README` §7.1 / D8）───────────────
+
+
+def test_none_by_design_sentinel_is_recognized() -> None:
+    """`rfc = none-by-design` 的规则写哨兵键 → 走同一条降级判据（`diff` + `note` 通过）。
+
+    它**不是豁免**：台账里没有这一键，但"没有条款"本身就是登记过的证据。
+    """
+    from mimeconform.rules import NO_CLAUSE_KEY
+
+    assert NO_CLAUSE_KEY == "none-by-design"
+    data = catalog(
+        rule(rule_id="MC-B05", klass="diff", severity="note", rfc="none-by-design", ledger_key=NO_CLAUSE_KEY)
+    )
+    rules = validate_catalog(data, {"clauses": {}})
+    assert rules[0].klass == "diff"
+    assert rules[0].severity == "note"
+
+
+def test_none_by_design_sentinel_cannot_be_hard() -> None:
+    """哨兵键解析成"原句为空"，因此拿不到 `hard` —— 这是它与"豁免"的区别。"""
+    from mimeconform.rules import NO_CLAUSE_KEY
+
+    data = catalog(
+        rule(rule_id="MC-B03", klass="hard", severity="major", rfc="none-by-design", ledger_key=NO_CLAUSE_KEY)
+    )
+    with pytest.raises(CatalogError, match="没有逐字原句"):
+        validate_catalog(data, {"clauses": {}})
+
+
+def test_none_by_design_sentinel_cannot_claim_major() -> None:
+    from mimeconform.rules import NO_CLAUSE_KEY
+
+    data = catalog(
+        rule(rule_id="MC-B03", klass="diff", severity="major", rfc="none-by-design", ledger_key=NO_CLAUSE_KEY)
+    )
+    with pytest.raises(CatalogError, match="severity 只能是 note"):
+        validate_catalog(data, {"clauses": {}})
+
+
 # ── 真实文件的当前状态（M0：尚未落地，必须报"不存在"而不是崩）────────────
 
 

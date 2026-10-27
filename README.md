@@ -58,7 +58,7 @@ mimeconform audit sample.eml --out reports/       # 目录形态：两种格式�
 mimeconform selftest                              # 校验 golden 语料自洽性
 ```
 
-### 三个可照抄的场景（当前能力：单封 `.eml` 的树与边界）
+### 三个可照抄的场景（当前能力：单封 `.eml` 的树与边界 + 头编码）
 
 ```bash
 # 场景 1：内层 boundary 与外层重复（cpython #69914）→ 退出码 3 + 两棵候选树
@@ -72,6 +72,23 @@ mimeconform audit data/golden/b-clean-nested/msg.eml --format json
 # 场景 3：缺 final boundary → 退出码 0（仅 diff/note 登记），报告给出"被迫闭合"的字节位置
 mimeconform audit data/golden/b-no-final/msg.eml --format md
 ```
+
+### 头编码（M3 起可跑）
+
+```bash
+# encoded-word 内折行（SO 52442469）→ 只报 MC-H12，被压掉的 MC-H03 进 related
+mimeconform audit data/golden/h-ew-newline/msg.eml --format json
+
+# 头行 > 998 octets → MC-H07（hard/major）→ 退出码 3
+mimeconform audit data/golden/h-line-998/msg.eml --format md
+
+# 缺 *0 序号的附件名（SO 44154520）→ MC-H09（diff/note，退出码仍 0）+ 修正提示文本
+mimeconform audit data/golden/h-2231-seq/msg.eml --format json
+```
+
+> 报告里的 `"tree": {"audited_engines": [...], "not_yet_audited": [...]}` 是**覆盖面声明**：
+> 一份干净的账本不等于"所有层都查过了"。未接入的层（`transfer` / `attribution` / `container`）
+> 的规则**未**参与本次判定。
 
 > `audit` 当前只审计**单封邮件**（`.eml`）。`.mbox` / Maildir 容器与
 > `--container` / `--mbox-variant` 自里程碑 M5 起支持；此刻传目录会得到 exit 1
@@ -130,15 +147,16 @@ TNEF / `winmail.dat` 专向、钓鱼 / URL / 内容安全分析、`.eml` 查看�
 | M0 | 计划套件 + 方法论装订 + 可运行骨架 | ✅ 完成 |
 | M1 | 数据先行（机读台账 + golden 语料生成器 + 51 case 语料） | ✅ 完成 |
 | M2 | 树与边界（MC-B） | ✅ 完成 |
-| M3 | 头编码（MC-H） | ⬜ 未开始 |
+| M3 | 头编码（MC-H）+ 缺陷分类表（人读 + 机读） | ✅ 完成 |
 | M4 | 传输编码（MC-T） | ⬜ 未开始 |
 | M5 | 归属与容器（MC-A / MC-C） | ⬜ 未开始 |
 | M6 | 发布 | ⬜ 未开始 |
 
 > 本表与 `plan/00`、`plan/05` 逐字一致，由 `tools/check_sprint_layout.py` 断言。
-> 当前 **M2 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B 系列），
-> 退出码 0/2/3 均为审计结论。M3–M5 的四个模块（`headers` / `transfer` / `attribution` /
-> `container`）**仍未实现**，调用即抛 `EngineNotReady` → exit 1——**未实现 ≠ 干净**。
+> 当前 **M3 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B 系列 + 头编码 MC-H 系列），
+> 退出码 0/2/3 均为审计结论。M4–M5 的三个模块（`transfer` / `attribution` /
+> `container`）**仍未实现**，调用即抛 `EngineNotReady` → exit 1——**未实现 ≠ 干净**，
+> 报告里的 `not_yet_audited` 字段同口径声明。
 
 ---
 
@@ -154,6 +172,7 @@ TNEF / `winmail.dat` 专向、钓鱼 / URL / 内容安全分析、`.eml` 查看�
 | `plan/05-里程碑与验收.md` | M0–M6 DoD / 守门测试清单 / 固定收尾流程 / 已知未验证项 |
 | `plan/06-交付对标与决策.md` | 评分维度证据 / 风险登记 / 缺口 |
 | `data/README.md` | **RFC 条款原句台账** + 实现差异分界表 + **数值口径（唯一真相源）** |
+| `docs/defect-catalog.md` | **缺陷分类表（人读）**：每条规则 → 判定 / `class` / `severity` / 台账行 / 正负例 / 常见误报；与 `mimeconform/rules/catalog.json` 机器对账 |
 | `AGENTS.md` | 仓库锚点：方法论装订 / 强制布局 / 门命令 |
 
 ---

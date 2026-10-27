@@ -233,6 +233,7 @@
   - **子项粒度**：键可写成 `<RFC号>-<节号>#<子项名>`（如 `RFC2046-5.1.1#close-delimiter-form`）。同一节里"有原句的子项"可支撑 `hard`、"没原句的子项"必须降级——按整节判会把后者放行。实现见 `mimeconform/rules/__init__.py:resolve_verbatim`。
   - **语义层禁令优先于原句门禁**：登记在 `SEMANTIC_RULES` 里的规则**即使台账里有原句也不得为 `hard`**（§7.1 升级禁令、`plan/00` D11）。
 - **当前未录清单（M1/M3 必须先补）**：R10（全行）、R11（全行）、R3 的 §6.2 子项、R4 的 §4.1/§4.2 子项、R7 的 delimiter 形态与 preamble/epilogue 子项、R9 的"base64 行 ≤76"子项。**对应规则在补齐前一律只出 `note`。**
+- **`none-by-design` 哨兵键（M3 落地）**：`rfc = none-by-design` 的规则在台账里**故意没有可解析的节号**（"没有条款"本身是证据，D8）。`catalog.json` 里这类规则的 `ledger_key` 写 `none-by-design`，原句门禁把它解析成"键存在、原句为空" ⇒ **只能 `diff`/`gray` + `note`**，与其它降级走同一条判据（不是豁免）。实现见 `mimeconform/rules/__init__.py:NO_CLAUSE_KEY` / `resolve_verbatim`。
 
 ### 7.2 规则编号语义（`rule_id`）
 
