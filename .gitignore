@@ -102,6 +102,14 @@ tmp/
 tmp_*.py
 scratch/
 
+# 本地安全扫描历史 / 工具状态（不入仓）
+.mimosa/
+
+# 变异验证的临时影子文件（由 tools/verify_layout_gate.py 逐组创建并还原；
+# 若中途 Ctrl-C 留下残留，删掉它们即可——它们绝不入库）
+*.mutant
+.mutant/
+
 # ---- 例外：golden 合成语料必须入库 ----
 # 仅 data/golden/ 下的合成样本（example.invalid 域 + 假附件名）允许提交；
 # 其他任何位置的 *.eml / *.mbox 一律禁止提交。
@@ -115,4 +123,4 @@ scratch/
 # 2) 提交前自检：`git ls-files '*.eml' '*.mbox'` 的输出必须全部落在 data/golden/ 下；
 #    出现其他路径即为隐私事故，须立即移除并重写历史。
 # 3) 禁止把真实邮件改名后放进 data/golden/ 逃避检查——该目录只允许语料生成器产出，
-#    由 `python -m mimeconform.devtools.regen --check` 逐字节核对（见 data/README.md §六）。
+#    由 `py -3.12 -m mimeconform.devtools.gen_golden --check` 逐字节核对（见 data/README.md §六）。

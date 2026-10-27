@@ -1,0 +1,9 @@
+# 源码包必须自带规则目录与口径台账（sdist / 解包树里 CLI 才能找到 catalog.json）
+include LICENSE
+include README.md
+include pyproject.toml
+include AGENTS.md
+recursive-include mimeconform *.py *.json
+# 口径台账的机读镜像（data/rfc-ledger.json）。它的**人读版** data/README.md
+# 是散文文件、不进包；包内读者需要的是"能不能查到某个键有没有逐字原句"。
+recursive-include data *.json

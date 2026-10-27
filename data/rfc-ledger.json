@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "source": "data/README.md §三（本文件是它的机读镜像；人读与机读必须同源，由 tests/test_ledger_mirror.py 断言）",
+  "baseline_date": "2026-10-27",
+  "note": "verbatim 为 null = 本轮只核到节号与语义、未逐字摘录原句。按 data/README §7.1 原句门禁，引用该键（或其 subclause）的规则只能是 diff/gray 且 severity=note。本文件不新增任何 data/README §三 之外的条款。",
+  "clauses": {
+    "RFC2047-2": {
+      "rfc": "RFC 2047",
+      "section": "2",
+      "row": "R1",
+      "recorded": "full",
+      "verbatim": "An 'encoded-word' may not be more than 75 characters long, including 'charset','encoding','encoded-text', and delimiters.",
+      "subclauses": {
+        "ew-length-75": {
+          "row": "R1",
+          "recorded": true,
+          "verbatim": "An 'encoded-word' may not be more than 75 characters long, including 'charset','encoding','encoded-text', and delimiters."
+        },
+        "header-line-76": {
+          "row": "R2",
+          "recorded": true,
+          "verbatim": "each line of a header field that contains one or more 'encoded-word's is limited to 76 characters."
+        },
+        "ew-inner-space-forbidden": {
+          "row": "R3",
+          "recorded": true,
+          "verbatim": "An 'encoded-word' may not be more than 75 characters long, including 'charset','encoding','encoded-text', and delimiters.",
+          "derivation": "encoded-word 的形态定义排除空白：§2 规定其语法为 charset/encoding/encoded-text 三段以 '?' 分隔且整体不含 LWSP。本子项按 R1 同节口径判定（data/README §三 R3 的 §2 子项为『见 R1 所在节』）。"
+        }
+      }
+    },
+    "RFC2047-6.2": {
+      "rfc": "RFC 2047",
+      "section": "6.2",
+      "row": "R3",
+      "recorded": "partial",
+      "verbatim": null,
+      "subclauses": {
+        "adjacent-ew-lwsp-ignored": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R3"
+        }
+      }
+    },
+    "RFC2047-4.1": {
+      "rfc": "RFC 2047",
+      "section": "4.1",
+      "row": "R4",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "q-encoding-syntax": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R4"
+        }
+      }
+    },
+    "RFC2047-4.2": {
+      "rfc": "RFC 2047",
+      "section": "4.2",
+      "row": "R4",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "b-encoding-length-4": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R4"
+        }
+      }
+    },
+    "RFC2047-5": {
+      "rfc": "RFC 2047",
+      "section": "5",
+      "row": "R4",
+      "recorded": "full",
+      "verbatim": "'encoded-text' MUST NOT be continued from one 'encoded-word' to another.",
+      "subclauses": {
+        "no-continuation-across-ew": {
+          "recorded": true,
+          "verbatim": "'encoded-text' MUST NOT be continued from one 'encoded-word' to another.",
+          "row": "R4"
+        }
+      }
+    },
+    "RFC5322-2.1.1": {
+      "rfc": "RFC 5322",
+      "section": "2.1.1",
+      "row": "R5",
+      "recorded": "full",
+      "verbatim": "Each line of characters MUST be no more than 998 characters, and SHOULD be no more than 78 characters, excluding the CRLF.",
+      "subclauses": {
+        "line-max-998": {
+          "recorded": true,
+          "verbatim": "Each line of characters MUST be no more than 998 characters, and SHOULD be no more than 78 characters, excluding the CRLF.",
+          "row": "R5"
+        }
+      }
+    },
+    "RFC2046-5.1.1": {
+      "rfc": "RFC 2046",
+      "section": "5.1.1",
+      "row": "R6",
+      "recorded": "partial",
+      "verbatim": "The Content-Type field for multipart entities requires one parameter, 'boundary'.",
+      "subclauses": {
+        "boundary-required": {
+          "row": "R6",
+          "recorded": true,
+          "verbatim": "The Content-Type field for multipart entities requires one parameter, 'boundary'."
+        },
+        "boundary-max-70": {
+          "row": "R6",
+          "recorded": true,
+          "verbatim": "must be no longer than 70 characters, not counting the two leading hyphens."
+        },
+        "delimiter-at-line-start": {
+          "row": "R7",
+          "recorded": false,
+          "verbatim": null
+        },
+        "close-delimiter-form": {
+          "row": "R7",
+          "recorded": false,
+          "verbatim": null
+        },
+        "preamble-epilogue-ignored": {
+          "row": "R7",
+          "recorded": false,
+          "verbatim": null
+        }
+      }
+    },
+    "RFC2046-5.1.2": {
+      "rfc": "RFC 2046",
+      "section": "5.1.2",
+      "row": "R7",
+      "recorded": "partial",
+      "verbatim": "each nested 'multipart' entity uses a different boundary delimiter.",
+      "subclauses": {
+        "nested-boundary-distinct": {
+          "row": "R7",
+          "recorded": true,
+          "verbatim": "each nested 'multipart' entity uses a different boundary delimiter."
+        }
+      }
+    },
+    "RFC2045-6.7": {
+      "rfc": "RFC 2045",
+      "section": "6.7",
+      "row": "R8",
+      "recorded": "full",
+      "verbatim": "encoded lines be no more than 76 characters long.",
+      "subclauses": {
+        "qp-line-max-76": {
+          "row": "R8",
+          "recorded": true,
+          "verbatim": "encoded lines be no more than 76 characters long."
+        },
+        "qp-soft-line-break": {
+          "row": "R8",
+          "recorded": true,
+          "verbatim": "An equal sign as the last character on an encoded line indicates such a non-significant ('soft') line break."
+        },
+        "qp-illegal-escape": {
+          "row": "R8",
+          "recorded": true,
+          "verbatim": "An equal sign as the last character on an encoded line indicates such a non-significant ('soft') line break.",
+          "derivation": "本子项是 R8 原句的**推导**：该句把行末 '=' 的唯一合法语义限定为软换行；§6.7 同时规定编码形态为 '=HH'。故 '=' 后既非行尾、也非两位十六进制时，两者皆不满足。docs/defect-catalog.md 必须同时写出推导链与『若审阅者要求更保守则降为 diff』的开关位置。"
+        }
+      }
+    },
+    "RFC2045-6.8": {
+      "rfc": "RFC 2045",
+      "section": "6.8",
+      "row": "R9",
+      "recorded": "partial",
+      "verbatim": "Any characters outside of the base64 alphabet are to be ignored in base64-encoded data.",
+      "subclauses": {
+        "b64-foreign-chars-ignored": {
+          "row": "R9",
+          "recorded": true,
+          "verbatim": "Any characters outside of the base64 alphabet are to be ignored in base64-encoded data."
+        },
+        "b64-line-max-76": {
+          "row": "R9",
+          "recorded": false,
+          "verbatim": null
+        },
+        "b64-padding": {
+          "row": "R9",
+          "recorded": false,
+          "verbatim": null
+        },
+        "b64-length-multiple-of-4": {
+          "row": "R9",
+          "recorded": false,
+          "verbatim": null
+        }
+      }
+    },
+    "RFC2231-3": {
+      "rfc": "RFC 2231",
+      "section": "3",
+      "row": "R10",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "param-continuation-numbering": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R10"
+        }
+      }
+    },
+    "RFC2231-4": {
+      "rfc": "RFC 2231",
+      "section": "4",
+      "row": "R10",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "charset-language-quotes": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R10"
+        }
+      }
+    },
+    "RFC2231-4.1": {
+      "rfc": "RFC 2231",
+      "section": "4.1",
+      "row": "R10",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "percent-escape": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R10"
+        }
+      }
+    },
+    "RFC2045-2.7": {
+      "rfc": "RFC 2045",
+      "section": "2.7",
+      "row": "R11",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "7bit-line-max-998": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R11"
+        }
+      }
+    },
+    "RFC2045-2.8": {
+      "rfc": "RFC 2045",
+      "section": "2.8",
+      "row": "R11",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "8bit-line-max-998": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R11"
+        }
+      }
+    },
+    "RFC2045-6.1": {
+      "rfc": "RFC 2045",
+      "section": "6.1",
+      "row": "R11",
+      "recorded": "none",
+      "verbatim": null,
+      "subclauses": {
+        "default-cte-7bit": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R11"
+        },
+        "cte-unknown-value": {
+          "recorded": false,
+          "verbatim": null,
+          "row": "R11"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+# 源码归一：所有文本文件在仓库内一律 LF
+* text=auto eol=lf
+
+# 字节即被测对象：golden 语料与归档容器禁止任何 EOL 归一
+# （生成器逐字节核对，git 不得改动其字节）
+data/golden/** -text
+*.eml -text
+*.mbox -text
+*.mbx -text
+
+# 机器可读口径文件保持 LF（可 diff、可逐字节复算）
+*.json text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
