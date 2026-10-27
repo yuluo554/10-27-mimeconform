@@ -1,0 +1,14 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: close delimiter with trailing content
+Message-ID: <fixed-0004@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="C"
+
+--C
+Content-Type: text/plain; charset=us-ascii
+
+part one
+--C--junk
+still part one (the --C--junk line is not a valid close)
+--C--

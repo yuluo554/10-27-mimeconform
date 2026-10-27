@@ -1,0 +1,27 @@
+{
+  "case": "b-no-final",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u8fb9\u754c\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "96961a466c46f083c8af11de89b1d059e9511952726395dd6403004671eb74c4",
+    "bytes": 293
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-B05",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 293,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "\u7f3a final boundary\uff1a\u6811\u5728\u7b2c 293 \u5b57\u8282\u88ab\u8feb\u95ed\u5408\uff08RFC \u53ea\u63cf\u8ff0 truncated entity\uff0c\u65e0\u6062\u590d\u89c4\u7a0b\uff09"
+    }
+  ],
+  "fingerprint": "011a815f669aefcc85c39da58839dd0ba4361fcdadb0f1490af615d19f3a9e80",
+  "tree_digest": null,
+  "note": "`diff/note` \u4e0d\u5f71\u54cd\u9000\u51fa\u7801\uff08\u9000\u51fa\u7801 0\uff09\u2014\u2014\u8bc1\u660e\u6ca1\u628a\u5b83\u786c\u5224\u6210\u9519\u8bef\uff08\u96be\u5ea6\u683c\uff1a\u00a7\u56db.1\uff09\u3002"
+}

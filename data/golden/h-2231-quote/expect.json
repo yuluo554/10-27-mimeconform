@@ -1,0 +1,27 @@
+{
+  "case": "h-2231-quote",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "b00c1155742e330fc0ee56a02eca747fda65da1dcd5b0f48cbeb11071a878638",
+    "bytes": 427
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H10",
+      "class": "diff",
+      "severity": "note",
+      "path": "0.2",
+      "offset": 371,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2231 \u00a73/\u00a74/\u00a74.1\uff08R10 \u6574\u884c\u672a\u5f55\u539f\u53e5 \u2192 \u95e8\u7981\u964d\u7ea7\uff0c\u53ea\u767b\u8bb0\uff09",
+      "detail": "`charset'language'value` \u7684\u5355\u5f15\u53f7\u4e0d\u5b8c\u6574\uff08`UTF-8'sample.pdf` \u53ea\u6709\u4e00\u4e2a `'`\uff1b\u5e94\u4e3a `UTF-8''sample.pdf`\uff09"
+    }
+  ],
+  "fingerprint": "17d829dfafb7c99b715f0556919e8a12976113d95c792161a2833ac74765e512",
+  "tree_digest": null,
+  "note": "R10 \u672a\u5f55 \u2192 \u53ea\u767b\u8bb0\u3002\u5224\u5b9a\u987a\u5e8f\u6309 \u00a77.5 \u7b2c 3 \u6761\uff08\u5408\u5e76\u7eed\u884c \u2192 \u4e09\u6bb5\u89e3\u6790 \u2192 %HH \u2192 2047\uff09\u3002"
+}

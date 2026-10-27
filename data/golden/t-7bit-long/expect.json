@@ -1,0 +1,27 @@
+{
+  "case": "t-7bit-long",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "b9528d6c48592634cca0784e8e315be0be6e6edd33ab53b34329cf8aeda898be",
+    "bytes": 1244
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T09",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 242,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a72.7/\u00a72.8/\u00a76.1\uff08R11 \u6574\u884c\u672a\u5f55\u539f\u53e5 \u2192 \u95e8\u7981\u964d\u7ea7\uff0c\u53ea\u767b\u8bb0\uff09",
+      "detail": "7bit \u6b63\u6587\u884c 1000 > 998 octets\uff08R11 \u6574\u884c\u672a\u5f55 \u2192 \u53ea\u767b\u8bb0\uff09"
+    }
+  ],
+  "fingerprint": "4b0346453a63d5557bc3c903b26cbd5bfff26409421d244fd9db7741f9afde87",
+  "tree_digest": null,
+  "note": "\u6b63\u6587\u884c\u5bbd\u4e0e\u5934\u884c\u5bbd\u662f\u4e24\u6761\u8d26\uff1a\u5934\u884c\u8d85 998 \u8d70 MC-H07\uff08R5 \u5df2\u5f55\uff09\uff0c\u6b63\u6587\u884c\u8d85 998 \u8d70\u672c\u6761\uff08R11 \u672a\u5f55 \u2192 note\uff09\u3002"
+}

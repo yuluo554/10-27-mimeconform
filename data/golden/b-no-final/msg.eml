@@ -1,0 +1,11 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: multipart missing its final boundary
+Message-ID: <fixed-0006@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="F"
+
+--F
+Content-Type: text/plain; charset=us-ascii
+
+truncated entity, no --F-- line

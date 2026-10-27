@@ -1,0 +1,15 @@
+From alice@example.invalid Thu Jan  1 00:00:00 2026
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: first message
+Message-ID: <fixed-0074@example.invalid>
+
+first body
+From bob@example.invalid Thu Jan  1 00:00:00 2026
+From carol@example.invalid Thu Jan  1 00:00:00 2026
+From: carol@example.invalid
+To: alice@example.invalid
+Subject: third message
+Message-ID: <fixed-0075@example.invalid>
+
+third body

@@ -1,0 +1,27 @@
+{
+  "case": "a-no-disposition",
+  "expectation": "positive",
+  "source": "SO 24246391\u2014\u2014\u539f\u8bdd\uff1amessage-text always goes into attachment",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "5fb66303d2d3b45665a3e72a1b297e4851bbb46a49b6177a536d7f79ac1d3a8d",
+    "bytes": 444
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-A08",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 174,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "\u4e24\u4e2a\u53f6\u8282\u70b9\u90fd\u7f3a\u53ef\u5224\u5b9a disposition\uff0c\u4e14\u6ca1\u6709 text/plain \u6b63\u6587\u5019\u9009\uff1a\u4e0b\u6e38\u7684\u6b63\u6587/\u9644\u4ef6\u5f52\u5c5e\u65e0\u6cd5\u5224\u5b9a\uff08SO 24246391 \u7684\u5f62\u72b6\uff09"
+    }
+  ],
+  "fingerprint": "2e0973cb57f64c7429d53d6284b7f16535161e84afa09781bf9555e5ff02c643",
+  "tree_digest": null,
+  "note": "\u767b\u8bb0\u5728 multipart \u8282\u70b9\uff08path `0`\uff09\uff1a\u73b0\u8c61\u662f\u300c\u6574\u68f5\u6811\u5f52\u5c5e\u4e0d\u53ef\u5224\u5b9a\u300d\uff0c\u4e0d\u662f\u5355\u4e2a\u53f6\u8282\u70b9\u7684\u8d26\u3002"
+}

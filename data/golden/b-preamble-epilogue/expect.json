@@ -1,0 +1,37 @@
+{
+  "case": "b-preamble-epilogue",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u8fb9\u754c\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "c5df61daeecdb1fcbf63f218ae6bb10e0ecb7b598dc77b44b5a56df2e85ee8f5",
+    "bytes": 369
+  },
+  "exit_code": 0,
+  "defect_count": 2,
+  "defects": [
+    {
+      "rule_id": "MC-B07",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 209,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2046 \u00a75.1.1",
+      "detail": "\u5b58\u5728 preamble \u5b57\u8282\u533a\u95f4\uff08RFC 2046 \u00a75.1.1 \u8981\u6c42\u5ffd\u7565\uff1b\u5b58\u5728\u672c\u8eab\u4e0d\u662f\u8fdd\u89c4\uff09"
+    },
+    {
+      "rule_id": "MC-B08",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 323,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2046 \u00a75.1.1",
+      "detail": "\u5b58\u5728 epilogue \u5b57\u8282\u533a\u95f4\uff08RFC 2046 \u00a75.1.1 \u8981\u6c42\u5ffd\u7565\uff1b\u5b58\u5728\u672c\u8eab\u4e0d\u662f\u8fdd\u89c4\uff09"
+    }
+  ],
+  "fingerprint": "2d1d4753553a1073531b04acc7eaeba08a47c1544a55722d8da750c2fbfae580",
+  "tree_digest": null,
+  "note": "\u4e24\u6761\u90fd\u662f `note`\uff08\u767b\u8bb0\u5b57\u8282\u533a\u95f4\uff0c\u7528\u4e8e\u89e3\u91ca\u300c\u591a\u51fa\u6765\u7684\u5185\u5bb9\u53bb\u54ea\u4e86\u300d\uff09\uff1bpreamble/epilogue **\u4e0d\u8ba1\u5165** `body_sha256`\u3002"
+}

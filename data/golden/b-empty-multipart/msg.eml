@@ -1,0 +1,8 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: multipart with no body parts
+Message-ID: <fixed-0008@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="E"
+
+--E--

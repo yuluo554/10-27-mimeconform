@@ -1,0 +1,9 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: base64 with characters outside the alphabet
+Message-ID: <fixed-0043@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: base64
+
+QUJD*QUJD

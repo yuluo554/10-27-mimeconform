@@ -1,0 +1,10 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: legal base64 with 76-column folding
+Message-ID: <fixed-0051@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: base64
+
+QUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJDQUJD
+AA==

@@ -1,0 +1,9 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: quoted-printable artifacts swallow characters
+Message-ID: <fixed-0046@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+We request all our =ustomers to read the notice, then =o:p> shows up in the markup, and please make =ure it works.

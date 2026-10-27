@@ -1,0 +1,33 @@
+{
+  "case": "b-deep-nest",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u8fb9\u754c\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "38e9445715cb35ec0652fbdc435159b19f8d8f4bd5287af18fadbfb19aeb9bf5",
+    "bytes": 2481
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-B09",
+      "class": "gray",
+      "severity": "note",
+      "path": "0.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1",
+      "offset": 1941,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "\u5d4c\u5957\u6df1\u5ea6 33 > --max-depth 32\uff08RFC \u672a\u89c4\u5b9a\u6df1\u5ea6\u4e0a\u9650\uff1b\u7b56\u7565\u9879\uff0c\u9ed8\u8ba4\u4e0d\u5f71\u54cd\u9000\u51fa\u7801\uff09"
+    }
+  ],
+  "expect_extra": {
+    "max_depth": 32,
+    "depth_convention": "\u8282\u70b9\u6df1\u5ea6 = \u8def\u5f84\u6bb5\u6570\uff08\u6839\u90e8\u4ef6 `0` \u4e3a\u7b2c 1 \u5c42\uff1b`0.1` \u4e3a\u7b2c 2 \u5c42\uff09",
+    "first_over_depth_path": "0.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1",
+    "truncated": true
+  },
+  "fingerprint": "86284bc0456a1eca097d6a4f9eaa513c3ae937572fc030723ff3a430861f3ed2",
+  "tree_digest": null,
+  "note": "`--strict-depth` \u624d\u628a\u8d85\u6df1\u5ea6\u8ba1\u5165\u9000\u51fa\u7801\uff08\u5c4a\u65f6 severity \u63d0\u4e3a minor\uff09\uff1b\u9ed8\u8ba4\u4e0b\u672c\u6587\u4ef6\u9000\u51fa\u7801 0\u3002\u5f15\u64ce\u8d85\u9650**\u505c\u6b62\u4e0b\u94bb**\u5e76\u767b\u8bb0 `truncated`\uff0c\u4e0d\u662f\u5d29\u6e83\u3001\u4e0d\u662f\u9759\u9ed8\u622a\u65ad\u3002"
+}

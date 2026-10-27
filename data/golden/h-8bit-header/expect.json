@@ -1,0 +1,27 @@
+{
+  "case": "h-8bit-header",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "d70c023d3e470abdf6d9645bb5387104d66e9f8c55abb500fdf5350095700e16",
+    "bytes": 184
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H08",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 65,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "Subject \u5934\u503c\u542b\u672a\u7f16\u7801\u7684\u975e ASCII \u5b57\u8282\uff08RFC 2047 \u662f\u7f16\u7801\u673a\u5236\uff0c\u4e0d\u662f\u7981\u4ee4\uff1b\u73b0\u5b9e\u5b9e\u73b0\u5e38\u76f4\u4f20 8bit\uff09"
+    }
+  ],
+  "fingerprint": "86c5c04838ae460f1ded3bedef5fe2f49a777fd7aa876feeb12012bb2bd60fa1",
+  "tree_digest": null,
+  "note": "`diff`\uff1a\u4e0d\u786c\u5224\uff0c\u53ea\u767b\u8bb0\u504f\u79fb\u4e0e\u6240\u5728\u5934\u540d\u3002"
+}

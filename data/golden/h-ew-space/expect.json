@@ -1,0 +1,27 @@
+{
+  "case": "h-ew-space",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "c3bdf1ef01c021a7389babd870a9952815b1bc67b328cf4e248b464d0b261f3f",
+    "bytes": 197
+  },
+  "exit_code": 2,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H03",
+      "class": "hard",
+      "severity": "minor",
+      "path": "0",
+      "offset": 63,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2047 \u00a72",
+      "detail": "encoded-word \u5185\u90e8\u51fa\u73b0\u7a7a\u767d\uff08\u5f62\u6001\u5b9a\u4e49\u6392\u9664 LWSP\uff1b\u672c\u6837\u672c\u65e0\u6298\u884c\uff0c\u4e0d\u4e0e MC-H12 \u4e92\u65a5\uff09"
+    }
+  ],
+  "fingerprint": "8581b408158738c083d43d2c9dc2cbe1433946f02917fb4b9e18fe81ace9ad8c",
+  "tree_digest": null,
+  "note": "\u4e0e MC-H12 \u4e92\u65a5\uff08\u00a77.5 \u7b2c 2 \u6761\uff09\uff1a\u65e0\u6298\u884c\u65f6\u53ea\u62a5\u672c\u89c4\u5219\u3002"
+}

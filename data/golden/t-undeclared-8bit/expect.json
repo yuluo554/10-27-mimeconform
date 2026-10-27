@@ -1,0 +1,27 @@
+{
+  "case": "t-undeclared-8bit",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "8f6f0992dbbb968b5546f5144082cb008055fb480722a94699642986021e73d4",
+    "bytes": 210
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T10",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 200,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a72.7/\u00a72.8/\u00a76.1\uff08R11 \u6574\u884c\u672a\u5f55\u539f\u53e5 \u2192 \u95e8\u7981\u964d\u7ea7\uff0c\u53ea\u767b\u8bb0\uff09",
+      "detail": "\u672a\u58f0\u660e Content-Transfer-Encoding\uff08\u7f3a\u7701\u4e3a 7bit\uff09\uff0c\u4f46\u6b63\u6587\u542b 8bit \u5b57\u8282\uff08R11 \u6574\u884c\u672a\u5f55 \u2192 \u53ea\u767b\u8bb0\uff09"
+    }
+  ],
+  "fingerprint": "69ce2418508dfe5b7c4cfe70df62ebd303fae0c0f17309c77dbfc6d866112276",
+  "tree_digest": null,
+  "note": "\u7f3a\u7701 7bit \u7684\u53e3\u5f84\u6765\u81ea R11 \u7684 \u00a76.1 \u5b50\u9879\uff08\u672a\u5f55\u539f\u53e5\uff09\u2192 \u672c\u6761\u4e5f\u53ea\u80fd\u51fa `note`\uff1b\u8865\u9f50\u540e\u63d0\u4e3a hard\u3002"
+}

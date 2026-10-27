@@ -1,0 +1,27 @@
+{
+  "case": "t-b64-foreign",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "f96a4da0a7c61b20d0e7d5207a9a2c458a96a0d31935d3717a4c675fff344931",
+    "bytes": 261
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T04",
+      "class": "hard",
+      "severity": "note",
+      "path": "0",
+      "offset": 254,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a76.8",
+      "detail": "base64 \u51fa\u73b0\u5b57\u6bcd\u8868\u5916\u5b57\u7b26 `*`\uff08RFC 2045 \u00a76.8 \u539f\u53e5\u8981\u6c42\u5ffd\u7565\u5b83 \u2192 \u51fa\u73b0\u672c\u8eab\u4e0d\u662f\u8fdd\u89c4\uff0c\u53ea\u767b\u8bb0\u5e76\u8ba1\u5165 foreign_chars\uff09"
+    }
+  ],
+  "fingerprint": "98fe37492eba18b840a6eca24c11b9ac42ca1e3edd37ac8760e92fac4447cb60",
+  "tree_digest": null,
+  "note": "\u00a77.1\uff1a\u672c\u6761\u5b50\u9879\u539f\u53e5**\u5168\u5f55** \u2192 \u8bc1\u636e\u5f3a\u5ea6\u662f hard\uff1b\u4f46\u73b0\u8c61\u4e0d\u6784\u6210\u8fdd\u89c4 \u2192 severity \u53ea\u80fd\u662f `note`\u3002"
+}

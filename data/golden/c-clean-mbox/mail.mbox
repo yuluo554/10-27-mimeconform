@@ -1,0 +1,22 @@
+From alice@example.invalid Thu Jan  1 00:00:00 2026
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: clean message one
+Message-ID: <fixed-0078@example.invalid>
+
+>From the desk of alice
+regular body line
+From bob@example.invalid Thu Jan  1 00:00:00 2026
+From: bob@example.invalid
+To: carol@example.invalid
+Subject: clean message two
+Message-ID: <fixed-0079@example.invalid>
+
+another body
+From carol@example.invalid Thu Jan  1 00:00:00 2026
+From: carol@example.invalid
+To: alice@example.invalid
+Subject: clean message three
+Message-ID: <fixed-0080@example.invalid>
+
+third body

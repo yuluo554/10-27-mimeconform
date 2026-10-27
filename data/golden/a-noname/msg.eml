@@ -1,0 +1,18 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: attachment without any filename parameter
+Message-ID: <fixed-0062@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix1"
+
+--mix1
+Content-Type: text/plain; charset=us-ascii
+
+body
+--mix1
+Content-Type: application/pdf
+Content-Disposition: attachment
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjQK
+--mix1--

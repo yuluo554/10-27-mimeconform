@@ -1,0 +1,27 @@
+{
+  "case": "t-qp-double",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "4142bdb08748133d269ba0c23608cd39aab1aa1bb08a85b77624d5a394c5ff09",
+    "bytes": 307
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T11",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 271,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "QP \u89e3\u7801\u4e00\u904d\u4e4b\u540e\u6b63\u6587\u91cc\u4ecd\u51fa\u73b0\u5b57\u9762 `=3D`\uff1a\u4e0a\u6e38\u7591\u4f3c\u88ab\u7f16\u7801\u4e86\u4e24\u6b21\uff08\u53ea\u767b\u8bb0\uff0c\u4e0d\u731c\u8d23\u4efb\u65b9\uff09"
+    }
+  ],
+  "fingerprint": "d724d49352e2eb6c5ebe42cff287c59b6b7b058d20790ab116747506695d6383",
+  "tree_digest": null,
+  "note": "`=3D` \u5728**\u7f16\u7801\u6001**\u6b63\u6587\u91cc\u5408\u6cd5\uff1b\u672c\u89c4\u5219\u53ea\u5728**\u89e3\u7801\u540e**\u4ecd\u89c1\u5b57\u9762 `=3D` \u65f6\u89e6\u53d1\u3002"
+}

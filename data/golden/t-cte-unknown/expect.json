@@ -1,0 +1,27 @@
+{
+  "case": "t-cte-unknown",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "7ef28af7bf46bf4c068cdda78fb53b9ac62003bf0d33860a4a30cf8b56bb6195",
+    "bytes": 259
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T08",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 209,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "\u672a\u77e5 CTE \u53d6\u503c `x-mystery-enc`\uff08\u65e2\u4e0d\u662f 7bit/8bit/binary/quoted-printable/base64\uff0c\u4e5f\u4e0d\u662f\u5df2\u77e5\u6269\u5c55 token\uff09"
+    }
+  ],
+  "fingerprint": "559ecae4b063d75ba6b558f90c2ff23b328a2f98acbc2903250422a398d7d447",
+  "tree_digest": null,
+  "note": "\u00a77.5 \u7b2c 5 \u6761\uff1a\u5148\u5224\u58f0\u660e\u503c\u662f\u5426\u5df2\u77e5\uff08T08\uff09\u2192 \u518d\u5224\u58f0\u660e\u5f62\u6001\u5408\u6cd5\u6027 \u2192 \u6700\u540e\u624d\u5224 declared vs observed\uff1bCTE \u672a\u77e5\u65f6\u65e0\u6cd5\u4ea4\u53c9\u6821\u9a8c\u3002"
+}

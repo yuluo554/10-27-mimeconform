@@ -1,0 +1,14 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: multipart with preamble and epilogue
+Message-ID: <fixed-0007@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="P"
+
+This is the preamble (ignored per RFC 2046).
+--P
+Content-Type: text/plain; charset=us-ascii
+
+part one
+--P--
+This is the epilogue (ignored per RFC 2046).

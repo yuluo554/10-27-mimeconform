@@ -1,0 +1,27 @@
+{
+  "case": "a-cid-open",
+  "expectation": "positive",
+  "source": "SO 10107788\u2014\u2014\u539f\u8bdd\uff1ahow to set a name of the embedded image\uff08related / cid \u5f52\u5c5e\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "2fb26410998164e932f1ea45b65eac06d9c3a10e3c32ada05cf7721e6c9c6ce8",
+    "bytes": 530
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-A04",
+      "class": "diff",
+      "severity": "note",
+      "path": "0.1",
+      "offset": 293,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "\u6b63\u6587\u5f15\u7528 `cid:img002@example.invalid`\uff0c\u4f46\u6ca1\u6709\u4efb\u4f55\u90e8\u4ef6\u7684 Content-ID \u4e0e\u4e4b\u5bf9\u5e94\uff08img001 \u5b58\u5728\u4f46\u6ca1\u4eba\u5f15\u7528\uff09\u2014\u2014\u6bd4\u8f83\u6309\u5c16\u62ec\u53f7\u5185\u5b57\u9762\u503c\u3001\u4e0d URL \u89e3\u7801"
+    }
+  ],
+  "fingerprint": "7591bd820d014ee611e4af7c4fd9370fa7576a30ade53f4706316b83aecd0373",
+  "tree_digest": null,
+  "note": "\u504f\u79fb\u951a\u5728\u6b63\u6587\u91cc\u7684 cid: \u5f15\u7528\u672c\u8eab\uff08\u7edd\u5bf9\u5b57\u8282\u504f\u79fb\uff09\uff0c\u62a5\u544a\u80fd\u4e00\u773c\u56de\u7b54\u300c\u5f15\u7528\u4e86\u8c01\u3001\u8c01\u6ca1\u5230\u300d\u3002"
+}

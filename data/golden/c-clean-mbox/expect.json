@@ -1,0 +1,24 @@
+{
+  "case": "c-clean-mbox",
+  "expectation": "negative",
+  "source": "\u81ea\u9020\u5bb9\u5668\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "mail.mbox",
+    "sha256": "a01b3207881f22d32079d80b283078da80c45388b11d9d0f233a94cf33fff761",
+    "bytes": 587
+  },
+  "exit_code": 0,
+  "defect_count": 0,
+  "defects": [],
+  "expect_extra": {
+    "variant_split_counts": {
+      "mboxo": 3,
+      "mboxrd": 3,
+      "mboxcl": 3
+    },
+    "auto": "mboxo"
+  },
+  "fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tree_digest": null,
+  "note": "\u96f6\u7f3a\u9677\u57fa\u7ebf\uff1a`>From ` \u884c\u662f**\u6b63\u786e\u8f6c\u4e49**\uff08\u539f\u6b63\u6587\u884c\u4ee5 `From ` \u5f00\u5934\uff09\u3002\u5b83\u7684\u8bfb\u6cd5\u5dee\u5f02\uff08mboxo \u4fdd\u7559 / mboxrd \u53cd\u8f6c\u4e49\uff09\u5c5e\u53d8\u4f53\u884c\u4e3a\u3001\u4e0d\u6784\u6210\u8fdd\u89c4\uff1bMC-C02 \u53ea\u5728\u300c\u672a\u8f6c\u4e49\uff08\u88f8 `From ` \u884c\u88ab\u8bef\u5f53\u5206\u9694\u884c\uff09\u300d\u65f6\u89e6\u53d1\u3002"
+}

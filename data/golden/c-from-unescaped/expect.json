@@ -1,0 +1,36 @@
+{
+  "case": "c-from-unescaped",
+  "expectation": "positive",
+  "source": "HN 32979369 / HN 6855700\uff08mbox \u8f6c\u4e49\u95ee\u9898\uff1b\u9010\u5b57\u539f\u8bdd\u89c1 data/README.md \u00a71.4\uff0c\u672c case \u53ea\u5f15\u7f16\u53f7\u3001\u4e0d\u6539\u5199\u5f15\u6587\uff09",
+  "input": {
+    "file": "mail.mbox",
+    "sha256": "a761ad35bff399a14c4b7d49345905b76c05eae8398b3c8f1f1c2958565ac439",
+    "bytes": 486
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-C02",
+      "class": "diff",
+      "severity": "note",
+      "path": "msg#1",
+      "offset": 229,
+      "offset_kind": "message-relative",
+      "rfc": "none-by-design",
+      "detail": "\u6b63\u6587\u91cc\u7684 `From ` \u884c\u672a\u8f6c\u4e49\uff08mboxo \u7ea6\u5b9a\u5e94\u5199\u6210 `>From `\uff09\uff1amboxo/mboxrd \u8bfb\u6cd5\u5728\u6b64\u8bef\u5207\u4e00\u6761\u6d88\u606f\uff0cmboxcl \u6309 Content-Length \u4e0d\u53d7\u5f71\u54cd \u2192 \u5404\u53d8\u4f53\u5207\u5206\u8868\u4e0d\u4e00\u81f4\uff0c\u5168\u90e8\u8981\u8f93\u51fa"
+    }
+  ],
+  "expect_extra": {
+    "variant_split_counts": {
+      "mboxo": 3,
+      "mboxrd": 3,
+      "mboxcl": 2
+    },
+    "auto": "mboxcl",
+    "content_length": 82
+  },
+  "fingerprint": "942597257ea7c7c52d4f4221ae7e0d02d4bdcb5475e92b85e217663921b6f235",
+  "tree_digest": null,
+  "note": "`auto` \u6309 \u00a77.7 \u7684\u7eaf\u5b57\u8282\u89c4\u5219\uff1a\u51fa\u73b0 `Content-Length:` \u5934 \u2192 mboxcl\uff08\u672c case \u7684\u4e3b\u8868\uff09\u3002\u53d8\u4f53\u5dee\u5f02\u5373\u672c\u89c4\u5219\u7684\u8bc1\u636e\u3002"
+}

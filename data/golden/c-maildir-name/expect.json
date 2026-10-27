@@ -1,0 +1,32 @@
+{
+  "case": "c-maildir-name",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5bb9\u5668\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "maildir/cur/1700000000-bad-name",
+    "sha256": "99bbbd6af7333d9dba3f121e4b698b52a7c70a84a240e951676c21663733bdde",
+    "bytes": 150
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-C05",
+      "class": "diff",
+      "severity": "note",
+      "path": "msg#1",
+      "offset": 0,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "cur/ \u4e0b\u7684\u6761\u76ee\u540d `1700000000-bad-name` \u7f3a `:2,<flags>` \u4fe1\u606f\u6bb5\uff08Maildir \u7ea6\u5b9a\uff1acur \u6761\u76ee\u5e94\u4e3a `<unique>:2,<flags>`\uff09\uff1bMaildir \u6ca1\u6709 RFC \u4f9d\u636e \u2192 \u53ea\u767b\u8bb0"
+    }
+  ],
+  "expect_extra": {
+    "container": "maildir",
+    "entry": "cur/1700000000-bad-name",
+    "offset_note": "\u89c4\u5219\u4f5c\u7528\u4e8e\u6587\u4ef6\u540d\u3001\u65e0\u5b57\u8282\u504f\u79fb \u2192 offset=0 \u662f\u5360\u4f4d"
+  },
+  "fingerprint": "670b37f306e66c3b72a51036f5dc8b8623a9503290eb08b6c5bcb620ecc2311b",
+  "tree_digest": null,
+  "note": "\u8f93\u5165\u662f\u76ee\u5f55\u5f62\u6001\uff08Maildir\uff09\uff1a`input.file` \u6307\u5411\u76ee\u5f55\u91cc\u7684\u6761\u76ee\uff0cM5 \u7684 golden \u56de\u5f52\u6309 case \u76ee\u5f55\u4e0b\u7684 `maildir/` \u5b9a\u4f4d\u5bb9\u5668\u3002"
+}

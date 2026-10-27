@@ -91,16 +91,17 @@ def _golden_files() -> list[Path]:
 
 
 def test_golden_dir_state_is_explicit() -> None:
-    """语料未落地时必须"可见地缺席"，不能静默当通过（空分母 ≠ 通过）。"""
+    """语料已落地：目录必须存在且非空（空分母 ≠ 通过）。"""
     files = _golden_files()
-    if not files:
-        pytest.skip("data/golden 尚无文件（里程碑 M1 落地）；本判据当前不适用，不是通过")
+    assert GOLDEN.is_dir(), "data/golden 不存在（里程碑 M1 的语料未落地）"
+    assert files, "data/golden 存在但一个文件都没有（空分母 ≠ 通过）"
+    case_dirs = sorted(path for path in GOLDEN.iterdir() if path.is_dir())
+    assert case_dirs, "data/golden 下没有任何 case 目录"
 
 
 def test_golden_files_use_reserved_domains_only() -> None:
     files = _golden_files()
-    if not files:
-        pytest.skip("data/golden 尚无文件（里程碑 M1 落地）")
+    assert files, "data/golden 没有文件 —— 判据是空转的"
     offenders: list[str] = []
     for path in files:
         if path.suffix.lower() in {".png", ".pdf", ".jpg", ".gif", ".zip"}:

@@ -1,0 +1,27 @@
+{
+  "case": "a-name-mismatch",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5f52\u5c5e\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "37396b2180a5cafb05f0a28ebdba8e8f5d5f355b146b0f9962fc5cf53efc7ebf",
+    "bytes": 458
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-A02",
+      "class": "diff",
+      "severity": "note",
+      "path": "0.2",
+      "offset": 341,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "Content-Type \u7684 name=\"a.pdf\" \u4e0e Content-Disposition \u7684 filename=\"report.pdf\" \u4e0d\u4e00\u81f4\uff08\u4e0b\u6e38\u6309\u4e0d\u540c\u5b57\u6bb5\u53d6\u540d\u4f1a\u5f97\u5230\u4e24\u4e2a\u540d\u5b57\uff09"
+    }
+  ],
+  "fingerprint": "da86e761d857494a471ba575df0302b1c29ee39356267315d2b0a3209adb13f7",
+  "tree_digest": null,
+  "note": "filename \u53d6\u503c\u987a\u5e8f\uff08\u5148 2231 \u540e 2047\uff09\u4e0e\u591a\u5b57\u6bb5\u5f25\u5408\u7684\u8bb0\u5f55\u53e3\u5f84\u89c1 `data/README.md` \u00a77.5\u3002"
+}

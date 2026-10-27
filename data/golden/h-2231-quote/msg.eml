@@ -1,0 +1,17 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: 2231 encoded parameter without complete quotes
+Message-ID: <fixed-0026@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix1"
+
+--mix1
+Content-Type: text/plain; charset=us-ascii
+
+body text of part one
+--mix1
+Content-Type: application/pdf
+Content-Disposition: attachment; filename*0*=UTF-8'sample.pdf
+
+JVBERi0xLjQK
+--mix1--

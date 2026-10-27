@@ -1,0 +1,26 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: well-formed nested multipart
+Message-ID: <fixed-0010@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="outer"
+
+--outer
+Content-Type: multipart/alternative; boundary="inner"
+
+--inner
+Content-Type: text/plain; charset=us-ascii
+
+plain version
+--inner
+Content-Type: text/html; charset=us-ascii
+
+<p>html version</p>
+--inner--
+--outer
+Content-Type: application/pdf; name="a.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="a.pdf"
+
+JVBERi0xLjQKJcOkw7zDtsOfCg==
+--outer--

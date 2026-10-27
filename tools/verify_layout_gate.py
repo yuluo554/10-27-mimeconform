@@ -228,8 +228,8 @@ NEGATIVE_CONTROLS: tuple[Mutation, ...] = (
     Mutation(
         "N02 缺口格里写带文件名的完成说明（剥离后必须放行）",
         "plan/06-交付对标与决策.md",
-        "| G2 | golden 语料 | ⬜ 待 M1 | `--check` 0 diff |",
-        "| G2 | golden 语料 | ⬜ 待 M1 | `--check` 0 diff；已落地说明见 `plan/RELEASE-M6.md` |",
+        "| G2 | golden 语料 | ✅ 关闭（51 case，`--check` 0 diff） | `--check` 0 diff |",
+        "| G2 | golden 语料（说明见 `plan/RELEASE-M6.md`） | ✅ 关闭（51 case，`--check` 0 diff） | `--check` 0 diff |",
         "LAYOUT.GAPS",
         expect_green=True,
     ),

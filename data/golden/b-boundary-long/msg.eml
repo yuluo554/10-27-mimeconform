@@ -1,0 +1,12 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: boundary longer than 70 characters
+Message-ID: <fixed-0002@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+--AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Content-Type: text/plain; charset=us-ascii
+
+part one
+--AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA--

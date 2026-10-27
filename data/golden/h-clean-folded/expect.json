@@ -1,0 +1,16 @@
+{
+  "case": "h-clean-folded",
+  "expectation": "negative",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "c82c95541579854959bf9859506947b4d87e7e903d076e9ee39060c1efb1fc16",
+    "bytes": 239
+  },
+  "exit_code": 0,
+  "defect_count": 0,
+  "defects": [],
+  "fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tree_digest": null,
+  "note": "\u96f6\u7f3a\u9677\u57fa\u7ebf\uff1a\u4e24\u4e2a encoded-word \u5404\u81ea \u226475\u3001\u884c \u226476\u3001\u4e4b\u95f4\u6709 FWS\uff0c\u4e14**\u6bcf\u4e2a encoded-word \u81ea\u8eab\u5b8c\u6574**\uff08\u4e0d\u8de8\u884c\uff09\u2192 \u4e0d\u6784\u6210 MC-H12\u3002"
+}

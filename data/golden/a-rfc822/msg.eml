@@ -1,0 +1,22 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: forwarded message attached without a disposition
+Message-ID: <fixed-0065@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix1"
+
+--mix1
+Content-Type: text/plain; charset=us-ascii
+
+please review the attached message
+--mix1
+Content-Type: message/rfc822
+
+From: carol@example.invalid
+To: dave@example.invalid
+Subject: forwarded message
+Message-ID: <fixed-0066@example.invalid>
+Content-Type: text/plain; charset=us-ascii
+
+forwarded body text
+--mix1--

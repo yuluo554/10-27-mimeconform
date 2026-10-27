@@ -1,0 +1,27 @@
+{
+  "case": "b-no-boundary",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u8fb9\u754c\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "9cab21fdb3e2402f7e335ee95380ec7717d1d176d70ddfa9341f38deb7380b41",
+    "bytes": 235
+  },
+  "exit_code": 3,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-B01",
+      "class": "hard",
+      "severity": "blocker",
+      "path": "0",
+      "offset": 162,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2046 \u00a75.1.1",
+      "detail": "multipart/mixed \u7f3a boundary \u53c2\u6570\uff08RFC 2046 \u00a75.1.1 \u8981\u6c42\u591a\u90e8\u4ef6\u5b9e\u4f53\u5fc5\u987b\u6709\u4e00\u4e2a boundary \u53c2\u6570\uff09"
+    }
+  ],
+  "fingerprint": "08b76339acfb16abd628b5145918b83d280da540bbc8156b30676f52036493de",
+  "tree_digest": null,
+  "note": "\u7ed3\u6784\u65e0\u6cd5\u5efa\u7acb\uff08\u65e0\u4efb\u4f55\u53ef\u7528 delimiter\uff09\u2192 `blocker`\uff0c\u9000\u51fa\u7801 3\u3002"
+}

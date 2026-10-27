@@ -1,0 +1,8 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: multipart without boundary parameter
+Message-ID: <fixed-0001@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed
+
+plain text body, no delimiter anywhere

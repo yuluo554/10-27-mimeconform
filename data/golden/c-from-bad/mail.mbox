@@ -1,0 +1,14 @@
+From alice@example.invalid Thu Jan  1 00:00:00 2026
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: first message
+Message-ID: <fixed-0070@example.invalid>
+
+first body
+From alice@example.invalid
+From: carol@example.invalid
+To: alice@example.invalid
+Subject: second message with a malformed separator
+Message-ID: <fixed-0071@example.invalid>
+
+second body

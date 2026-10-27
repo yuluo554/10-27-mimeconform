@@ -1,0 +1,9 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: quoted-printable encoded twice
+Message-ID: <fixed-0047@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+double-encoded residue: =3D3D stays visible after one pass

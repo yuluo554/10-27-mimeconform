@@ -30,8 +30,8 @@
 | `tools/check_sprint_layout.py` + `tools/check_desensitized.py` | 布局门 + 脱敏门（纯标准库，进 CI layout job） | ✅ v1（2026-10-27，M0） |
 | `README.md` | 安装 / 三场景 / 字段说明 / 已知边界 / 状态表 | 🟡 骨架版（M0）；场景随模块落地补齐 |
 | `docs/defect-catalog.md` + `mimeconform/rules/catalog.json` | 缺陷分类表（人读 + 机读） | ⬜ 待 M3 |
-| `data/rfc-ledger.json` | RFC 条款台账的机读镜像（原句门禁的判据源） | ⬜ 待 M1 |
-| `data/golden/<case>/` | golden `.eml` 语料（每类缺陷 ≥2 正例 + 1 负例，含 `msg.eml` / `expect.json` / `README.md`） | ⬜ 待 M1 |
+| `data/rfc-ledger.json` | RFC 条款台账的机读镜像（原句门禁的判据源） | ✅ 已落（M0 产出，M1 逐行对账） |
+| `data/golden/<case>/` | golden 语料 51 个 case（b/h/t/a/c 五簇，各含负例），每 case 三件 `输入 + expect.json + README.md` | ✅ 完成（M1） |
 | `plan/HANDOFF-M<k>.md` | 每棒交接单（七节） | ✅ M0 已豁免（见 §五） |
 | `plan/RELEASE-M6.md` | 发布留档（tag 前落盘，发布后事实分栏追加） | ⬜ 待 M6 |
 
@@ -87,7 +87,7 @@
 | 条款引用可查（11 行 RFC 条款） | 逐条读 RFC 原文（2045/2046/2047/2231/5322） | ✅ 台账在 `data/README.md` §三 + 机读镜像 `data/rfc-ledger.json` | 每条 `hard` 缺陷的 `rfc` 字段可在台账中检索到同一节号；**且该子项的「原句留档」必须覆盖它**（5 行全录 / 4 行部分 / 2 行未录；部分录与未录的子项只能出 `note`） | ✅ 台账已建（含逐行留档状态列）；✅ 机读镜像已落（M0），`tests/test_ledger_mirror.py` 逐行对账 |
 | 原句门禁（机械，非口头纪律） | `data/rfc-ledger.json` + `catalog.json` 构建期校验 | ✅ 契约在 `data/README.md` §7.1；校验实现已落 `mimeconform/rules/__init__.py` | 故意把某规则的 `rfc` 指向 `verbatim=null` 的键 → 校验必须失败（`CatalogError`） | 🟡 校验逻辑与注入用例已落；**真实 `catalog.json` 待 M3**（在此之前本条只对注入数据生效） |
 | 三值判定分类 `hard`/`diff`/`gray` | 自定纪律（D7 + `data/README.md` §7.1） | ✅ | `catalog.json` 中每条规则 `class` ∈ {hard,diff,gray}；语义层规则断言 ≠ `hard` | 🟡 校验逻辑与注入用例已落；**真实 catalog 待 M3** |
-| `rfc` 字段无空值 | 自定纪律（D8） | ✅ | `expect.json` 逐条断言 `rfc` 非空；`none-by-design` 计数可查 | ⬜ 待 M1 |
+| `rfc` 字段无空值 | 自定纪律（D8） | ✅ | `expect.json` 逐条断言 `rfc` 非空；`none-by-design` 计数可查 | ✅ 完成（M1：51 case × 逐条断言，`selftest` 复算） |
 | 复现 cpython #69914（内层 boundary 重复） | issue 原文 + 自造样本 | ✅ | `data/golden/b-inner-dup/`：MC-B06 `hard/major` + 两棵候选树 | ⬜ 待 M2 |
 | 复现 cpython #56141（折行头破坏边界检测） | issue 原文 + 自造样本 | ✅ | `data/golden/b-wrapped-header/` | ⬜ 待 M2 |
 | 复现 cpython #93376（畸形 `From ` 行） | issue 原文 + 自造 mbox | ✅ | `data/golden/c-from-bad/`：MC-C01 + 两变体切分表 | ⬜ 待 M5 |
@@ -97,7 +97,7 @@
 | 复现 SO 6029218（base64 损坏） | SO 原话 + 自造样本 | ✅ | `data/golden/t-b64-len/`：MC-T03 `hard/major` | ⬜ 待 M4 |
 | 复现 SO 6255202（文本附件被当正文） | SO 原话 | ✅ | `data/golden/a-body-attach/`：MC-A01 `diff` | ⬜ 待 M5 |
 | 复现 SO 12816042（缺 filename → Noname） | SO 原话 | ✅ | `data/golden/a-noname/`：MC-A03 `diff` | ⬜ 待 M5 |
-| 负例零误报（合法 QP / 合法 base64 / 合法多 encoded-word / 完好嵌套树 / 正确归属） | 自造负例 | ✅ | 各组 `expect.json` 缺陷数 = 0 | ⬜ 待模块 M1–M5 |
+| 负例零误报（合法 QP / 合法 base64 / 合法多 encoded-word / 完好嵌套树 / 正确归属） | 自造负例 | ✅ | 各组 `expect.json` 缺陷数 = 0 | 🟡 语料侧 7 组负例已落（b/h/t×2/a/c）；引擎侧零误报待 M2–M5 |
 | 确定性输出（同输入双跑逐字节一致） | 自定纪律 | ✅ | 双跑 `cmp`；golden 为逐字节基线 | 🟡 渲染与序列化层已锁（`tests/test_determinism.py`）；**引擎层双跑待 M2** |
 | 审计引擎不 `import email` | 自定纪律（D6） | ✅ | AST 守门测试：`mimeconform/` 下全部非 devtools 模块无 `email` 导入（含相对导入 / `from X import Y` / 动态导入四形态） | ✅ 守门已落（M0）；随 M2–M5 新模块自动覆盖 |
 | 零网络 | 无 `socket`/`urllib`/`http` 导入 | ✅ 静态可证 | AST 守门 + CI 的 `docker run --network none` 离线作业 | ✅ 守门 + 离线 job 已落（M0）；离线 job 待首推验证 |
@@ -137,7 +137,7 @@
 | 里程碑 | 内容 | 状态 |
 | --- | --- | --- |
 | **M0 计划先行 + 骨架** | 装订三件（`AGENTS.md` + `tools/` 两道门 + 本文件顶部装订行）+ `plan/00`–`06` + `data/README.md` + `.gitignore` / `.gitattributes` / `LICENSE` + 可运行骨架（`--version` / `selftest` / 退出码 0·1）+ AST 守门测试 | ✅ 完成（2026-10-27） |
-| **M1 数据先行（golden `.eml` 语料 + 机读台账）** | `data/rfc-ledger.json` + 语料生成器 + `data/golden/`：**每类缺陷至少 2 个正例 + 1 个负例**；每 case 带 `expect.json`（含 `class` / `severity` / `rfc` / 指纹）与来源说明 | ⬜ 未开始 |
+| **M1 数据先行（golden `.eml` 语料 + 机读台账）** | `data/rfc-ledger.json` + 语料生成器 + `data/golden/`：**每类缺陷至少 2 个正例 + 1 个负例**；每 case 带 `expect.json`（含 `class` / `severity` / `rfc` / 指纹）与来源说明 | ✅ 完成（2026-10-27） |
 | **M2 树与边界** | 字节扫描状态机 + multipart 树重建 + MC-B 系列；复现 #69914（两棵候选树）与手工"缺 final boundary"样本 | ⬜ 未开始 |
 | **M3 头编码** | RFC 2047 / 2231 检查 + MC-H 系列；复现 SO 44154520（缺 `*0`）与 SO 52442469（encoded-word 内换行）；缺陷分类表落盘 | ⬜ 未开始 |
 | **M4 传输编码（CTE）** | base64 / QP 自写编解码 + MC-T 系列；复现 SO 79133579（QP 伪影）与 SO 6029218（base64 损坏） | ⬜ 未开始 |

@@ -1,0 +1,27 @@
+{
+  "case": "h-b-length",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "75435ef2791a24c0d703e40aa7b75c47234a29ed8241ff482c7c88c01d14fe84",
+    "bytes": 201
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H05",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 63,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2047 \u00a74.2\uff08R4 \u8be5\u5b50\u9879\u672a\u5f55\u539f\u53e5 \u2192 \u95e8\u7981\u964d\u7ea7\uff0c\u53ea\u767b\u8bb0\uff09",
+      "detail": "B \u7f16\u7801 base64 \u957f\u5ea6 11 \u4e0d\u662f 4 \u7684\u500d\u6570"
+    }
+  ],
+  "fingerprint": "b084b813c816931413fcb51af7fe51dbe7443995586e4c99a1043d04c5c5d239",
+  "tree_digest": null,
+  "note": "R4 \u00a74.2 \u5b50\u9879\u539f\u53e5\u672a\u5f55 \u2192 \u53ea\u767b\u8bb0\uff08\u00a77.1\uff09\u3002"
+}

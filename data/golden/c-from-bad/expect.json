@@ -1,0 +1,36 @@
+{
+  "case": "c-from-bad",
+  "expectation": "positive",
+  "source": "cpython #93376\uff08open\uff09\u2014\u2014 issue \u539f\u8bdd\uff1amailbox.mbox malformed From lines not being detected/handled",
+  "input": {
+    "file": "mail.mbox",
+    "sha256": "b368d57224ca1f7013462161b5e300720dd56eb2858871a48ba26955da03e999",
+    "bytes": 366
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-C01",
+      "class": "diff",
+      "severity": "note",
+      "path": "msg#2",
+      "offset": 0,
+      "offset_kind": "message-relative",
+      "rfc": "none-by-design",
+      "detail": "\u5206\u9694\u884c `From alice@example.invalid` \u7f3a\u65e5\u671f\u5b57\u6bb5\uff08envelope \u65e0\u6cd5\u89e3\u6790\uff09\uff1ambox \u7ea6\u5b9a\u662f `From <\u5730\u5740> <\u65e5\u671f>`\uff0c\u5b83\u4e0d\u662f RFC\uff08D3\uff09\u2192 \u53ea\u767b\u8bb0\uff08\u6587\u4ef6\u5185\u4f4d\u7f6e\u89c1 expect_extra.file_offset\uff09"
+    }
+  ],
+  "expect_extra": {
+    "variant_split_counts": {
+      "mboxo": 2,
+      "mboxrd": 2,
+      "mboxcl": 2
+    },
+    "auto": "mboxo",
+    "file_offset": 180
+  },
+  "fingerprint": "2d574621be2fd2828bfd8ba1af403085693166ed127b7f16a39794763d2b5615",
+  "tree_digest": null,
+  "note": "\u8be5\u884c\u4ecd\u88ab\u5f53\u4f5c\u6d88\u606f\u8fb9\u754c\uff08\u7247\u6bb5\u81ea\u8eab\u53ef\u89e3\u6790\uff09\u2192 \u552f\u4e00\u7684\u95ee\u9898\u662f\u5206\u9694\u884c\u5f62\u6001\uff0c\u4e0d\u518d\u53e0\u62a5\u5176\u4ed6\u5bb9\u5668\u89c4\u5219\u3002"
+}

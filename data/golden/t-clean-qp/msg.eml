@@ -1,0 +1,10 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: legal quoted-printable with a real soft break
+Message-ID: <fixed-0052@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+
+This line ends with a legitimate soft break =
+and the next line carries an escape =3D plus ordinary text.

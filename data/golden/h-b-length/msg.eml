@@ -1,0 +1,8 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: =?UTF-8?B?QUJDREVGR0g?=
+Message-ID: <fixed-0024@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+
+body

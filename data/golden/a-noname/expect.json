@@ -1,0 +1,27 @@
+{
+  "case": "a-noname",
+  "expectation": "positive",
+  "source": "SO 12816042\u2014\u2014\u539f\u8bdd\uff1aPDF attachment is called Noname\uff08\u7f3a filename \u53c2\u6570\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "7122503588005159dc390264719a3f15db328921e6b568ea02c4b15c779283d9",
+    "bytes": 410
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-A03",
+      "class": "diff",
+      "severity": "note",
+      "path": "0.2",
+      "offset": 316,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "attachment \u6ca1\u6709\u4efb\u4f55 filename / name \u53c2\u6570\uff1a\u4e0b\u6e38\u628a\u9644\u4ef6\u663e\u793a\u6210 Noname\uff08SO 12816042 \u7684\u5f62\u72b6\uff09"
+    }
+  ],
+  "fingerprint": "fc16c0b18624d381bf0c944a599250068ac07c8920a9d54611a1abc6d3d6f724",
+  "tree_digest": null,
+  "note": "`plan/03` \u00a7\u56db \u539f\u5199 minor\uff0c\u4e0e \u00a77.1 \u539f\u53e5\u95e8\u7981\u51b2\u7a81 \u2192 M1 \u843d note\uff08\u540c\u8f6e\u4fee\u6b63\u6458\u5f55\uff09\u3002"
+}

@@ -1,0 +1,27 @@
+{
+  "case": "b-close-malformed",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u8fb9\u754c\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "1aebcaa3b692998699138c3a64299005b69be0c891d0c6dd1ddd82d37503268d",
+    "bytes": 347
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-B04",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 271,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2046 \u00a75.1.1",
+      "detail": "close-delimiter \u5f62\u6001\u9519\u8bef\uff1a`--C--` \u4e4b\u540e\u8fd8\u6709 `junk`\uff08\u53ea\u5141\u8bb8\u53ef\u5ffd\u7565\u7684\u7a7a\u767d\u4e0e\u884c\u5c3e\uff09"
+    }
+  ],
+  "fingerprint": "e33171314c72674cd868046f139203d200eaa06732c4771734c085f6c737c526",
+  "tree_digest": null,
+  "note": "\u6587\u4ef6\u91cc\u540c\u65f6\u5b58\u5728\u4e00\u4e2a**\u5408\u6cd5**\u7684 `--C--` \u6536\u5c3e \u2192 \u4e0d\u8bb0 MC-B05\uff08\u7f3a final boundary\uff09\u3002"
+}

@@ -1,0 +1,14 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: delimiter with leading whitespace
+Message-ID: <fixed-0003@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="S"
+
+--S
+Content-Type: text/plain; charset=us-ascii
+
+first part body
+  --S
+still inside the first part
+--S--

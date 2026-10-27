@@ -1,0 +1,27 @@
+{
+  "case": "a-related-start",
+  "expectation": "positive",
+  "source": "SO 39328935\u2014\u2014\u539f\u8bdd\uff1aWhy doesn't my embedded image display in Gmail or Office 365?",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "e6b5d3ea3a7c77d47f7d2a79d3ab03d5bcd77d084e735b76d7787ee705db0ad0",
+    "bytes": 594
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-A05",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 179,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "start \u6307\u5411 0.2\uff08<img001@example.invalid>\uff09\uff0c\u800c\u5b9e\u9645\u9996\u90e8\u4ef6\u662f 0.1\uff08<body-root@example.invalid>\uff09\uff1astart \u4e0e\u5b9e\u9645\u9996\u90e8\u4ef6\u4e0d\u4e00\u81f4\uff08type=\"text/html\" \u4e0e\u9996\u90e8\u4ef6\u4e00\u81f4\uff0c\u53ea\u8bb0 start \u8fd9\u4e00\u9879\uff09"
+    }
+  ],
+  "fingerprint": "ba7b1bc3fb4b969aaacfd64538d4de35f05c10444591ef4ac85aeed53dd4e0da",
+  "tree_digest": null,
+  "note": "`start` \u7f3a\u7701\u65f6\u53d6\u7b2c\u4e00\u4e2a\u5b50\u90e8\u4ef6\uff08\u672c\u9898\u53e3\u5f84\uff09\uff1b\u663e\u5f0f\u7ed9\u51fa\u5374\u4e0d\u6307\u5411\u9996\u90e8\u4ef6 \u2192 \u767b\u8bb0\u3002"
+}

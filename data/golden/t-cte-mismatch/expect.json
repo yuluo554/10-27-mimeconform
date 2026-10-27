@@ -1,0 +1,35 @@
+{
+  "case": "t-cte-mismatch",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "c29e4b50ff9db1563e0706870bebf2d44b9aac9d0df2bbb3c80f7a272ad89a1b",
+    "bytes": 297
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T01",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 249,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "\u58f0\u660e base64\u3001\u5b9e\u9645\u5f62\u6001\u4e3a\u660e\u6587\uff08\u8bed\u4e49\u5c42\u5224\u5b9a\uff0c\u4e0d\u662f\u6761\u6b3e\u5224\u5b9a\uff1b\u4e0d\u786c\u5224 \u2192 \u9000\u51fa\u7801\u4e0d\u53d7\u5f71\u54cd\uff09"
+    }
+  ],
+  "expect_extra": {
+    "suppressed": [
+      "MC-T02",
+      "MC-T03",
+      "MC-T04"
+    ],
+    "suppression_note": "observed \u5b8c\u5168\u4e0d\u662f base64 \u5f62\u6001\u65f6\u4e0d\u9010\u6761\u767b\u8bb0\u5b57\u6bcd\u8868\u5916\u5b57\u7b26/\u957f\u5ea6\u5b50\u9879\uff08\u5426\u5219\u540c\u4e00\u6bb5\u5b57\u8282\u4f1a\u51fa\u51e0\u5341\u6761 note \u8d26\uff09\u2014\u2014 M4 \u4ee5\u6b64\u4e3a\u51c6"
+  },
+  "fingerprint": "4af3b03eba31ec3c1e8a225de5efe19c376fcee4aeaedcd265333858f23627cd",
+  "tree_digest": null,
+  "note": "D2 / \u00a7\u56db.3\uff1aMC-T01 \u6c38\u8fdc `diff`\uff0c`rfc` \u5199 none-by-design \u2014\u2014 \u672c\u9898\u6700\u9700\u8981\u514b\u5236\u7684\u4e00\u683c\uff1b\u9000\u51fa\u7801\u4e0d\u53d8\uff08note\uff09\u3002"
+}

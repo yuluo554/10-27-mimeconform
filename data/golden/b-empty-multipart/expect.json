@@ -1,0 +1,27 @@
+{
+  "case": "b-empty-multipart",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u8fb9\u754c\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "2cde174f15c75956da71e1f12904f05527de0cb15fac2009284c7bc7ddcd9e3d",
+    "bytes": 208
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-B10",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 201,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "multipart/mixed \u65e0\u4efb\u4f55 body part\uff08RFC \u65e0\u660e\u6587\u6761\u6b3e\uff1b\u4f9d\u636e stdlib MultipartInvariantViolationDefect \u7684\u5b9e\u73b0\u4e8b\u5b9e\uff0c\u53ea\u767b\u8bb0\uff09"
+    }
+  ],
+  "fingerprint": "0479590435195277f1c398a22f6b56977f8459e544ebe11c13357bdad0d978bb",
+  "tree_digest": null,
+  "note": "\u300cmultipart \u81f3\u5c11\u6709\u5b50\u90e8\u4ef6\u300d\u662f\u4e0d\u53d8\u91cf\u4f46**\u65e0\u660e\u6587\u539f\u53e5** \u2192 \u8865\u9f50\u6458\u5f55\u524d\u53ea\u80fd\u51fa `note`\uff08\u539f\u53e5\u95e8\u7981\uff0c\u00a77.1\uff09\u3002"
+}

@@ -1,0 +1,27 @@
+{
+  "case": "t-qp-long",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "9fc20144f18e9c1241bf318d0a959ff3d867f4ddf74696d0be9a52692a10cf52",
+    "bytes": 335
+  },
+  "exit_code": 2,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T05",
+      "class": "hard",
+      "severity": "minor",
+      "path": "0",
+      "offset": 253,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a76.7",
+      "detail": "QP \u7f16\u7801\u884c 80 > 76 octets\uff08\u4e0d\u542b CRLF\uff09"
+    }
+  ],
+  "fingerprint": "fc55c636cad93403ff8d49f0c4f9f03575c8584fd11a24cb1a2f40baeffd25d6",
+  "tree_digest": null,
+  "note": "R8 \u5168\u5f55\u539f\u53e5\uff1aencoded lines be no more than 76 characters long\u3002\u884c\u5bbd\u6309 octets\u3001\u4e0d\u542b CRLF\u3002"
+}

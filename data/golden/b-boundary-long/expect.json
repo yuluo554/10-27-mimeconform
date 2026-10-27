@@ -1,0 +1,27 @@
+{
+  "case": "b-boundary-long",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u8fb9\u754c\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "e92f2c8a084448eb2b44242883d0f8286d85863ab0e2cded097c5dd59da38aff",
+    "bytes": 485
+  },
+  "exit_code": 2,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-B02",
+      "class": "hard",
+      "severity": "minor",
+      "path": "0",
+      "offset": 160,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2046 \u00a75.1.1",
+      "detail": "boundary \u957f\u5ea6 71 > 70\uff08\u4e0d\u542b\u524d\u5bfc\u4e24\u4e2a\u8fde\u5b57\u7b26\uff09"
+    }
+  ],
+  "fingerprint": "816a105a8f100502bcabf1355a7aad9bf3d1cf87bedeccfb78bbc687c8f967ad",
+  "tree_digest": null,
+  "note": "`minor` \u2192 \u9000\u51fa\u7801 2\uff08\u65e0 blocker/major\uff09\u3002"
+}

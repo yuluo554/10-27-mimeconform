@@ -1,0 +1,17 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: boundary parameter on a folded header line
+Message-ID: <fixed-0011@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="wrapped"
+
+--wrapped
+Content-Type: text/plain; charset=us-ascii
+
+one
+--wrapped
+Content-Type: text/html; charset=us-ascii
+
+<p>two</p>
+--wrapped--

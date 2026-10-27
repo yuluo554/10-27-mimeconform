@@ -1,0 +1,17 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: text attachment arrives as the body variable
+Message-ID: <fixed-0060@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix1"
+
+--mix1
+Content-Type: text/plain; charset=us-ascii
+
+this is the real message body
+--mix1
+Content-Type: text/plain; name="notes.txt"
+Content-Transfer-Encoding: 7bit
+
+its contents show up for the body variable instead
+--mix1--

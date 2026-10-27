@@ -1,0 +1,17 @@
+From alice@example.invalid Thu Jan  1 00:00:00 2026
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: an unescaped From line sits in this body
+Message-ID: <fixed-0072@example.invalid>
+Content-Length: 82
+
+body line one
+From alice@example.invalid Thu Jan  1 00:00:00 2026
+body line three
+From carol@example.invalid Thu Jan  1 00:00:00 2026
+From: carol@example.invalid
+To: alice@example.invalid
+Subject: second real message
+Message-ID: <fixed-0073@example.invalid>
+
+second body

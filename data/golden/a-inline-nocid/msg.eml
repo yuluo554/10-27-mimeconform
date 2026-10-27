@@ -1,0 +1,18 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: inline part without a Content-ID
+Message-ID: <fixed-0067@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix1"
+
+--mix1
+Content-Type: text/plain; charset=us-ascii
+
+body text
+--mix1
+Content-Type: image/png; name="img001.png"
+Content-Disposition: inline; filename="img001.png"
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgo=
+--mix1--

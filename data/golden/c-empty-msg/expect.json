@@ -1,0 +1,36 @@
+{
+  "case": "c-empty-msg",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5bb9\u5668\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "mail.mbox",
+    "sha256": "5c018af604729ff099b47eca23c745238c6634c3fb37cfc73a2ed78960bc1439",
+    "bytes": 412
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-C03",
+      "class": "diff",
+      "severity": "note",
+      "path": "msg#2",
+      "offset": 0,
+      "offset_kind": "message-relative",
+      "rfc": "none-by-design",
+      "detail": "\u96f6\u957f\u5ea6\u6d88\u606f\uff1a`From ` \u5206\u9694\u884c\uff08bob\uff09\u4e0e\u4e0b\u4e00\u6761\u5206\u9694\u884c\uff08carol\uff09\u4e4b\u95f4\u6ca1\u6709\u4efb\u4f55\u5b57\u8282\uff08\u6587\u4ef6\u5185\u4f4d\u7f6e\u89c1 expect_extra.file_offset\uff09"
+    }
+  ],
+  "expect_extra": {
+    "variant_split_counts": {
+      "mboxo": 3,
+      "mboxrd": 3,
+      "mboxcl": 3
+    },
+    "auto": "mboxo",
+    "file_offset": 180
+  },
+  "fingerprint": "00f50ee15bd050270d7b14f7946e1a05cf77f68d16d4f4de02d6d14c90995d6d",
+  "tree_digest": null,
+  "note": "\u7a7a\u6d88\u606f\u4ecd\u5360\u4e00\u4e2a `msg#N` \u5e8f\u53f7\uff08\u540e\u9762\u7684\u6d88\u606f\u5e8f\u53f7\u4e0d\u56de\u6536\uff09\u2014\u2014\u5e8f\u53f7\u6309\u5206\u9694\u884c\u51fa\u73b0\u987a\u5e8f\u3001\u4e0d\u6309\u5185\u5bb9\u957f\u5ea6\u3002"
+}

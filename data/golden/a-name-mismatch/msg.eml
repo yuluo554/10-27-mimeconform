@@ -1,0 +1,18 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: name parameter disagrees with the filename parameter
+Message-ID: <fixed-0061@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix1"
+
+--mix1
+Content-Type: text/plain; charset=us-ascii
+
+body
+--mix1
+Content-Type: application/pdf; name="a.pdf"
+Content-Disposition: attachment; filename="report.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjQK
+--mix1--

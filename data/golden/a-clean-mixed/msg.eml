@@ -1,0 +1,24 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: well-formed mixed message with two attachments
+Message-ID: <fixed-0069@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mix1"
+
+--mix1
+Content-Type: text/plain; charset=us-ascii
+
+the actual body text
+--mix1
+Content-Type: application/pdf; name="a.pdf"
+Content-Disposition: attachment; filename="a.pdf"
+Content-Transfer-Encoding: base64
+
+JVBERi0xLjQK
+--mix1
+Content-Type: image/png; name="img001.png"
+Content-Disposition: attachment; filename="img001.png"
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgo=
+--mix1--

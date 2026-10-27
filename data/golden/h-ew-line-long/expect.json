@@ -1,0 +1,27 @@
+{
+  "case": "h-ew-line-long",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "9d3bb0ed92af61e4d3e4e7af5afaf6a8d39950ecc8d9b3715b73cd6fe79ea252",
+    "bytes": 275
+  },
+  "exit_code": 2,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H02",
+      "class": "hard",
+      "severity": "minor",
+      "path": "0",
+      "offset": 3,
+      "offset_kind": "line",
+      "rfc": "RFC 2047 \u00a72",
+      "detail": "\u542b encoded-word \u7684\u5934\u884c 106 > 76 \u5b57\u7b26\uff08encoded-word \u672c\u8eab 36 \u2264 75\uff09"
+    }
+  ],
+  "fingerprint": "b48d98f8b409ae06918120a1ae696e7a0110c4efee2b978f0df8b1b5b063bc1e",
+  "tree_digest": null,
+  "note": "R2 \u5168\u5f55\u539f\u53e5\uff1b\u672c case \u53ea\u8d85\u884c\u5bbd\uff08\u4e0d\u8d85 encoded-word \u957f\u5ea6\uff09\uff0c\u4e0e MC-H01 \u6b63\u4ea4\u3002"
+}

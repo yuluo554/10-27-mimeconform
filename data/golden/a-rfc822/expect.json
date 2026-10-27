@@ -1,0 +1,27 @@
+{
+  "case": "a-rfc822",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5f52\u5c5e\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "9bd71ca0c40add3d65082ef7ecab978976b8a3563cda0cebf37872ca8f9041ac",
+    "bytes": 556
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-A06",
+      "class": "diff",
+      "severity": "note",
+      "path": "0.2",
+      "offset": 322,
+      "offset_kind": "absolute",
+      "rfc": "none-by-design",
+      "detail": "message/rfc822 \u8f6c\u53d1\u4f53\u6ca1\u6709 disposition\uff1a\u5b83\u662f\u8f6c\u53d1\u526f\u672c\u8fd8\u662f\u9644\u4ef6\u65e0\u6cd5\u5224\u5b9a\uff08\u5185\u5c42\u6d88\u606f\u81ea\u5df1\u7684\u5934\u5757\u5355\u72ec\u6210\u8282\uff09"
+    }
+  ],
+  "fingerprint": "70b66b73ded9aec591b7f6e94fbf3abe495813ea34c7dff7c46fe297efdcf5d3",
+  "tree_digest": null,
+  "note": "\u5d4c\u5957\u6d88\u606f\u7684\u5934\u5757\u5c5e\u4e8e\u5185\u5c42\u90e8\u4ef6\uff08\u5f15\u64ce\u9012\u5f52\u4e0b\u94bb\uff09\uff0c\u5916\u5c42\u53ea\u767b\u8bb0\u5f52\u5c5e\u65e0\u6cd5\u5224\u5b9a\u3002"
+}

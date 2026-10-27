@@ -1,0 +1,16 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: inner multipart duplicates the outer boundary
+Message-ID: <fixed-0005@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="X"
+
+--X
+Content-Type: multipart/alternative; boundary="X"
+
+--X
+Content-Type: text/plain; charset=us-ascii
+
+inner body
+
+--X--

@@ -1,0 +1,27 @@
+{
+  "case": "h-2231-pct",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "c41598ca206c9a939dd8d6a8e94c573f426bc99b5c2aae527cae67ab8d1d3508",
+    "bytes": 411
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H11",
+      "class": "diff",
+      "severity": "note",
+      "path": "0.2",
+      "offset": 373,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2231 \u00a73/\u00a74/\u00a74.1\uff08R10 \u6574\u884c\u672a\u5f55\u539f\u53e5 \u2192 \u95e8\u7981\u964d\u7ea7\uff0c\u53ea\u767b\u8bb0\uff09",
+      "detail": "`%ZZ` \u4e0d\u662f\u5408\u6cd5\u7684 %HH \u8f6c\u4e49\uff08H \u5fc5\u987b\u662f\u4e24\u4f4d\u5341\u516d\u8fdb\u5236\uff09"
+    }
+  ],
+  "fingerprint": "ef5c4b525d4c94c60b86837ea50f4db89757d68b27f1861c3dc29b78e9413e87",
+  "tree_digest": null,
+  "note": "R10 \u672a\u5f55 \u2192 \u53ea\u767b\u8bb0\uff08\u00a77.1\uff09\u3002"
+}

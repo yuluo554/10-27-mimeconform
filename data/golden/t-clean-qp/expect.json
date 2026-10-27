@@ -1,0 +1,16 @@
+{
+  "case": "t-clean-qp",
+  "expectation": "negative",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "674859d2eb1877f43bcde5df4302f2c426bd365c424ac6a92dacacd42fc8a708",
+    "bytes": 370
+  },
+  "exit_code": 0,
+  "defect_count": 0,
+  "defects": [],
+  "fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tree_digest": null,
+  "note": "\u96f6\u7f3a\u9677\u57fa\u7ebf\uff1a\u8f6f\u6362\u884c**\u540e\u9762\u786e\u6709\u4e0b\u4e00\u884c**\u3001\u6240\u6709 `=HH` \u5408\u6cd5\u3001\u884c\u5bbd \u226476\u3001\u89e3\u7801\u4e00\u904d\u540e\u4e0d\u518d\u51fa\u73b0\u5b57\u9762 `=HH`\u3002"
+}

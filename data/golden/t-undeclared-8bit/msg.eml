@@ -1,0 +1,8 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: 8bit body with no CTE header
+Message-ID: <fixed-0050@example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+
+café latte

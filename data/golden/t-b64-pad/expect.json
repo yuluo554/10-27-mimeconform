@@ -1,0 +1,27 @@
+{
+  "case": "t-b64-pad",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u4f20\u8f93\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "c70e6b0c07911153c1f4355df3053680cab25f53c95cf80c129457dfaba1bc48",
+    "bytes": 246
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-T02",
+      "class": "diff",
+      "severity": "note",
+      "path": "0",
+      "offset": 238,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a76.8\uff08R9 \u7684\u586b\u5145/\u957f\u5ea6\u5b50\u9879\u672a\u5f55\u539f\u53e5 \u2192 \u95e8\u7981\u964d\u7ea7\uff0c\u53ea\u767b\u8bb0\uff09",
+      "detail": "base64 \u586b\u5145\u975e\u6cd5\uff1a`=` \u4e4b\u540e\u4ecd\u6709\u6570\u636e\u5b57\u7b26\uff08\u586b\u5145\u53ea\u5141\u8bb8\u51fa\u73b0\u5728\u672b\u5c3e\uff0c\u4e14\u6700\u591a\u4e24\u4e2a\uff09"
+    }
+  ],
+  "fingerprint": "fb7c1db10759155cf404acce311b9054ba1f430e0fe7a293d79a731d16eb1a04",
+  "tree_digest": null,
+  "note": "R9 \u7684\u586b\u5145\u5b50\u9879\u539f\u53e5\u672a\u5f55 \u2192 \u53ea\u767b\u8bb0\uff08\u00a77.1 \u95e8\u7981\u964d\u7ea7\uff09\u3002"
+}

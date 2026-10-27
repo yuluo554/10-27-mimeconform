@@ -1,0 +1,9 @@
+From alice@example.invalid Thu Jan  1 00:00:00 2026
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: raw From line in the body
+Message-ID: <fixed-0076@example.invalid>
+
+body line one
+From bob@example.invalid Thu Jan  1 00:00:00 2026
+body line three

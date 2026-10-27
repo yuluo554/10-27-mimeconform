@@ -1,0 +1,6 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: maildir entry whose name is not compliant
+Message-ID: <fixed-0077@example.invalid>
+
+body

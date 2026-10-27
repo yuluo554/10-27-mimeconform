@@ -1,0 +1,20 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: related start parameter disagrees with the first part
+Message-ID: <fixed-0064@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="rel1"; start="<img001@example.invalid>"; type="text/html"
+
+--rel1
+Content-Type: text/html; charset=us-ascii
+Content-ID: <body-root@example.invalid>
+
+<p>hello</p>
+--rel1
+Content-Type: image/png; name="img001.png"
+Content-ID: <img001@example.invalid>
+Content-Disposition: inline; filename="img001.png"
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgo=
+--rel1--

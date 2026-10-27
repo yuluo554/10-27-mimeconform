@@ -1,0 +1,27 @@
+{
+  "case": "h-2231-seq",
+  "expectation": "positive",
+  "source": "SO 44154520\u2014\u2014\u539f\u8bdd\uff1aattachment file names arrive are in gibberish\uff1b\u5b9e\u6837\u542b name*=\"UTF-8''%D7%A2...\uff08\u7f3a *0 \u5e8f\u53f7\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "f556793f7c493d7a2d3a2943ea1b112c7359bd122147800f703b4f3543da62b7",
+    "bytes": 473
+  },
+  "exit_code": 0,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H09",
+      "class": "diff",
+      "severity": "note",
+      "path": "0.2",
+      "offset": 381,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2231 \u00a73/\u00a74/\u00a74.1\uff08R10 \u6574\u884c\u672a\u5f55\u539f\u53e5 \u2192 \u95e8\u7981\u964d\u7ea7\uff0c\u53ea\u767b\u8bb0\uff09",
+      "detail": "RFC 2231 \u53c2\u6570\u7f3a `*0` \u5e8f\u53f7\uff1a`filename*=` \u5e94\u5199\u6210 `filename*0*=`\uff08SO 44154520 \u7684\u5f62\u72b6\uff1b\u4fee\u6b63\u63d0\u793a\u662f\u6587\u672c\uff0c\u4e0d\u81ea\u52a8\u6539\u6587\u4ef6\uff09"
+    }
+  ],
+  "fingerprint": "76208a3874843cf0a967d179775a577ff14b3619f19bc5b5b2ea07de6b5a2f25",
+  "tree_digest": null,
+  "note": "\u9a8c\u6536\u4e0d\u4f9d\u8d56 severity\uff1a\u53ea\u65ad\u8a00\u300c\u62a5\u4e86 MC-H09 \u4e14\u8def\u5f84 `0.2` \u7cbe\u786e\u300d\u3002R10 \u6574\u884c\u539f\u53e5\u672a\u5f55 \u2192 \u8865\u9f50\u6458\u5f55\u524d\u53ea\u80fd\u51fa `note`\u3002SO \u5b9e\u6837\u91cc `name*=\"UTF-8''\u2026\"`\uff08\u5e26\u5f15\u53f7\u7684\u6269\u5c55\u503c\uff09\u4e0e `filename*=UTF-8''\u2026` \u90fd\u7f3a `*0`\uff1b\u672c\u6837\u672c\u53ea\u4fdd\u7559 `filename*` \u4e00\u5904\uff08\u540c\u4e00 case \u51fa\u4e24\u6761\u8d26\u4f1a\u7a00\u91ca\u5b9a\u4f4d\u7cbe\u5ea6\uff09\uff0c\u53e6\u4e00\u5904\u5f62\u72b6\u5728\u672c\u8bf4\u660e\u91cc\u8bb0\u8ff0\u3002"
+}

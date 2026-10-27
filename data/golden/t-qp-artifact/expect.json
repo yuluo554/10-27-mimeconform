@@ -1,0 +1,47 @@
+{
+  "case": "t-qp-artifact",
+  "expectation": "positive",
+  "source": "SO 79133579\u2014\u2014\u5b9e\u6837 We request all our =ustomers \u2026 =o:p> \u2026 please make =ure",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "8d8004c1ea4e1af81e8d3632a9971ee3d6e8605cac9cf070cdb581d681fd10da",
+    "bytes": 378
+  },
+  "exit_code": 3,
+  "defect_count": 3,
+  "defects": [
+    {
+      "rule_id": "MC-T07",
+      "class": "hard",
+      "severity": "major",
+      "path": "0",
+      "offset": 281,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a76.7",
+      "detail": "QP \u975e\u6cd5\u8f6c\u4e49 `=us`\uff1a`=` \u540e\u4e0d\u662f\u4e24\u4f4d\u5341\u516d\u8fdb\u5236\uff08\u539f\u5e16\u5b9e\u6837 =ustomers\uff09"
+    },
+    {
+      "rule_id": "MC-T07",
+      "class": "hard",
+      "severity": "major",
+      "path": "0",
+      "offset": 316,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a76.7",
+      "detail": "QP \u975e\u6cd5\u8f6c\u4e49 `=o:`\uff1a`=` \u540e\u4e0d\u662f\u4e24\u4f4d\u5341\u516d\u8fdb\u5236\uff08\u539f\u5e16\u5b9e\u6837 =o:p>\uff09"
+    },
+    {
+      "rule_id": "MC-T07",
+      "class": "hard",
+      "severity": "major",
+      "path": "0",
+      "offset": 362,
+      "offset_kind": "absolute",
+      "rfc": "RFC 2045 \u00a76.7",
+      "detail": "QP \u975e\u6cd5\u8f6c\u4e49 `=ur`\uff1a`=` \u540e\u4e0d\u662f\u4e24\u4f4d\u5341\u516d\u8fdb\u5236\uff08\u539f\u5e16\u5b9e\u6837 =ure\uff09"
+    }
+  ],
+  "fingerprint": "4329adcc8dc4af1d3c24a467596766173eda5d72864242dfb6ee232e122f6a3c",
+  "tree_digest": null,
+  "note": "**\u6bcf\u5904\u975e\u6cd5\u8f6c\u4e49\u5404\u8bb0\u4e00\u6761**\uff08\u7cbe\u786e\u5230\u5b57\u8282\u504f\u79fb\uff09\uff0c\u4e0d\u662f\u5408\u5e76\u6210\u4e00\u6761 \u2014\u2014 M4 \u843d\u5730\u65f6\u5f15\u64ce\u4e0e golden \u53d6\u540c\u4e00\u53e3\u5f84\u3002\u6761\u6b3e\u8bba\u8bc1\uff1aR8 \u628a\u884c\u672b `=` \u7684\u552f\u4e00\u5408\u6cd5\u8bed\u4e49\u9650\u5b9a\u4e3a\u8f6f\u6362\u884c\uff0c\u6545 `=` \u540e\u975e `HH` \u5373\u8fdd\u53cd \u00a76.7\uff1b\u63a8\u5bfc\u94fe\u5199\u8fdb `docs/defect-catalog.md`\uff08`plan/06` Q1 \u7559\u4e86\u300c\u964d\u4e3a diff\u300d\u7684\u5f00\u5173\uff09\u3002"
+}

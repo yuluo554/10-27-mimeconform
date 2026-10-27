@@ -1,0 +1,27 @@
+{
+  "case": "h-line-998",
+  "expectation": "positive",
+  "source": "\u81ea\u9020\u5934\u7f16\u7801\u6837\u672c\uff08\u65e0\u5916\u90e8\u6765\u6e90\uff09",
+  "input": {
+    "file": "msg.eml",
+    "sha256": "158b066a900ad67c49365c0bf285f109d1a34ce8cfd9692ea47e934a322bea4b",
+    "bytes": 1178
+  },
+  "exit_code": 3,
+  "defect_count": 1,
+  "defects": [
+    {
+      "rule_id": "MC-H07",
+      "class": "hard",
+      "severity": "major",
+      "path": "0",
+      "offset": 3,
+      "offset_kind": "line",
+      "rfc": "RFC 5322 \u00a72.1.1",
+      "detail": "\u5934\u884c 1009 > 998 octets\uff08\u4e0d\u542b CRLF\uff09"
+    }
+  ],
+  "fingerprint": "722d6db4be16fbf64cbc425e8ec853fd896ed8ce607f0a2107152b324f8c4f7a",
+  "tree_digest": null,
+  "note": "R5 \u5168\u5f55\uff1b\u5934\u884c > 998 \u5148\u4e8e encoded-word \u68c0\u67e5\uff08\u00a77.5 \u7b2c 1 \u6761\uff09\u3002"
+}

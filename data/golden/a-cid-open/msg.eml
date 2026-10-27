@@ -1,0 +1,19 @@
+From: alice@example.invalid
+To: bob@example.invalid
+Subject: cid reference without a matching Content-ID
+Message-ID: <fixed-0063@example.invalid>
+MIME-Version: 1.0
+Content-Type: multipart/related; boundary="rel1"
+
+--rel1
+Content-Type: text/html; charset=us-ascii
+
+<p>logo: <img src="cid:img002@example.invalid"></p>
+--rel1
+Content-Type: image/png; name="img001.png"
+Content-ID: <img001@example.invalid>
+Content-Disposition: inline; filename="img001.png"
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgo=
+--rel1--
