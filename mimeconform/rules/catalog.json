@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "note": "机读规则目录（plan/03 §九）。判据与门禁在 mimeconform/rules/__init__.py：每条 ledger_key 必须能在 data/rfc-ledger.json 解析出逐字原句，否则 class 只能是 diff/gray 且 severity 只能是 note。MC-B0x 的五字段与 scan._RULE_META 逐值一致，MC-H0x/1x 与 headers._RULE_META 逐值一致（tests/test_catalog_consistency.py 断言）。detector 指向**发出该规则号的函数**，tests/test_catalog_consistency.py 断言它真能在 module 里解析到。",
+  "note": "机读规则目录（plan/03 §九）。判据与门禁在 mimeconform/rules/__init__.py：每条 ledger_key 必须能在 data/rfc-ledger.json 解析出逐字原句，否则 class 只能是 diff/gray 且 severity 只能是 note。MC-B0x 的五字段与 scan._RULE_META 逐值一致，MC-H0x/1x 与 headers._RULE_META 逐值一致，MC-T* 与 transfer._RULE_META 逐值一致（tests/test_catalog_consistency.py 断言）。detector 指向**发出该规则号的函数**，tests/test_catalog_consistency.py 断言它真能在 module 里解析到。",
   "rules": [
     {
       "rule_id": "MC-B01",
@@ -221,6 +221,116 @@
       "ledger_key": "none-by-design",
       "detector": "headers.parse_headers",
       "summary": "encoded-word 内部含折行（折叠与解码顺序 RFC 未定；命中则 MC-H03 进 related）"
+    },
+    {
+      "rule_id": "MC-T01",
+      "module": "transfer",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "transfer.audit_body",
+      "summary": "声明 CTE 与实际形态不符（语义层判定，无交叉校验条款；只在声明 base64 时判，永不 hard）"
+    },
+    {
+      "rule_id": "MC-T02",
+      "module": "transfer",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2045 §6.8",
+      "ledger_key": "RFC2045-6.8#b64-padding",
+      "detector": "transfer._base64_defects",
+      "summary": "base64 填充非法（该子项原句未录 → 门禁降级，只登记）"
+    },
+    {
+      "rule_id": "MC-T03",
+      "module": "transfer",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2045 §6.8",
+      "ledger_key": "RFC2045-6.8#b64-length-multiple-of-4",
+      "detector": "transfer._base64_defects",
+      "summary": "base64 字符数不是 4 的倍数（该子项原句未录 → 门禁降级，只登记）"
+    },
+    {
+      "rule_id": "MC-T04",
+      "module": "transfer",
+      "klass": "hard",
+      "severity": "note",
+      "rfc": "RFC 2045 §6.8",
+      "ledger_key": "RFC2045-6.8#b64-foreign-chars-ignored",
+      "detector": "transfer._base64_defects",
+      "summary": "base64 出现字母表外字符（原句全录 → 证据强度 hard；但 RFC 要求忽略它 → 现象不构成违规，severity 只能 note）"
+    },
+    {
+      "rule_id": "MC-T05",
+      "module": "transfer",
+      "klass": "hard",
+      "severity": "minor",
+      "rfc": "RFC 2045 §6.7",
+      "ledger_key": "RFC2045-6.7#qp-line-max-76",
+      "detector": "transfer._qp_defects",
+      "summary": "QP 编码行 > 76 octets（不含 CRLF；含非法转义的行不记行宽）"
+    },
+    {
+      "rule_id": "MC-T06",
+      "module": "transfer",
+      "klass": "hard",
+      "severity": "minor",
+      "rfc": "RFC 2045 §6.7",
+      "ledger_key": "RFC2045-6.7#qp-soft-line-break",
+      "detector": "transfer._qp_defects",
+      "summary": "QP 行末 `=` 之后已无下一行：软换行无法接续（悬空转义）"
+    },
+    {
+      "rule_id": "MC-T07",
+      "module": "transfer",
+      "klass": "hard",
+      "severity": "major",
+      "rfc": "RFC 2045 §6.7",
+      "ledger_key": "RFC2045-6.7#qp-illegal-escape",
+      "detector": "transfer._qp_defects",
+      "summary": "QP 非法转义（`=` 后不是两位十六进制；R8 已录原句 + 推导链，见 docs/defect-catalog.md）"
+    },
+    {
+      "rule_id": "MC-T08",
+      "module": "transfer",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "transfer.audit_body",
+      "summary": "未知 CTE 取值（无法做交叉校验；先于 MC-T01）"
+    },
+    {
+      "rule_id": "MC-T09",
+      "module": "transfer",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2045 §2.7/§2.8/§6.1",
+      "ledger_key": "RFC2045-2.7#7bit-line-max-998",
+      "detector": "transfer._line_width_defects",
+      "summary": "7bit/8bit 正文行 > 998 octets（R11 整行未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-T10",
+      "module": "transfer",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "RFC 2045 §2.7/§2.8/§6.1",
+      "ledger_key": "RFC2045-6.1#default-cte-7bit",
+      "detector": "transfer.audit_body",
+      "summary": "未声明 CTE（缺省 7bit）但正文含 8bit 字节（R11 整行未录 → 只登记）"
+    },
+    {
+      "rule_id": "MC-T11",
+      "module": "transfer",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "transfer._qp_defects",
+      "summary": "QP 二次编码残留（解码一遍后仍见字面 `=HH`；只登记，不猜责任方）"
     }
   ]
 }

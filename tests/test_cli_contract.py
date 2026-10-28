@@ -4,8 +4,8 @@
 输入不可读）、**2**（审计完成且只有 `minor`）、**3**（`major`/`blocker`）。
 
 **骨架期语义已被替换而非删除**（plan/00 D16）：那时 `audit` 对任何输入都 exit 1，
-用来证明"未实现 ≠ 干净"。M2 起 `scan` 已落地，于是 D16 的活口改成
-`test_unimplemented_engines_still_fail_loudly` —— 仍未实现的四个模块必须继续显式失败。
+用来证明"未实现 ≠ 干净"。M2 起 `scan` 已落地、M3 起 `headers`、M4 起 `transfer`，于是 D16 的活口改成
+`test_unimplemented_engines_still_fail_loudly` —— 仍未实现的两个模块必须继续显式失败。
 """
 
 from __future__ import annotations
@@ -173,18 +173,16 @@ def _empty_node():
 
 
 def test_unimplemented_engines_still_fail_loudly() -> None:
-    """M4–M5 的三个模块仍未实现 → 调用即抛 `EngineNotReady`，绝不静默返回。
+    """M5 的两个模块仍未实现 → 调用即抛 `EngineNotReady`，绝不静默返回。
 
     D16 的语义没有随里程碑消失，只是从 `audit` 搬到了这些模块上：**未实现 ≠ 干净**。
-    M3 起 `headers` 已落地，因此它从这里移出，改由
-    `test_headers_engine_is_wired_into_audit` 正向断言 —— 接线与"仍未实现"是两份证据。
+    M3 起 `headers` 已落地、M4 起 `transfer` 已落地，因此它们从这里移出，
+    改由正向断言（`test_headers_engine_is_wired_into_audit` /
+    `test_transfer_engine_is_wired_into_audit`）覆盖 —— 接线与"仍未实现"是两份证据。
     """
-    from mimeconform import attribution, container, transfer
+    from mimeconform import attribution, container
 
     calls = (
-        lambda: transfer.observe_body_shape(b"xxxx"),
-        lambda: transfer.decode_base64(b"QUJD"),
-        lambda: transfer.decode_qp(b"=3D"),
         lambda: attribution.audit_attribution(_empty_node()),
         lambda: container.split_container(b"From a@example.invalid x\n"),
     )
@@ -204,8 +202,23 @@ def test_headers_engine_is_wired_into_audit(tmp_path: Path) -> None:
     assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_MINOR
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert [d["rule_id"] for d in payload["defects"]] == ["MC-H03"], "头编码缺陷必须出现在 report 里"
-    assert payload["tree"]["audited_engines"] == ["scan", "headers"]
-    assert payload["tree"]["not_yet_audited"] == ["transfer", "attribution", "container"]
+    assert payload["tree"]["audited_engines"] == ["scan", "headers", "transfer"]
+    assert payload["tree"]["not_yet_audited"] == ["attribution", "container"]
+
+
+def test_transfer_engine_is_wired_into_audit(tmp_path: Path) -> None:
+    """M4 的接线证据：`audit` 必须真的跑 `transfer`（`transfer.audit_body` 单独可跑不算数）。
+
+    `t-qp-artifact` 只出 MC-T07，报告里的缺陷正是引擎判定；覆盖面字段同时把 `transfer`
+    从"尚未接入"移到"本轮已审计"。
+    """
+    case = GOLDEN / "t-qp-artifact" / "msg.eml"
+    out = tmp_path / "t.json"
+    assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_MAJOR
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert sorted({d["rule_id"] for d in payload["defects"]}) == ["MC-T07"], payload["defects"]
+    assert payload["tree"]["audited_engines"] == ["scan", "headers", "transfer"]
+    assert payload["tree"]["not_yet_audited"] == ["attribution", "container"]
 
 
 def test_headers_and_tree_defects_share_one_ledger() -> None:

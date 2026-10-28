@@ -5,9 +5,10 @@
 1. **`MC-B0x` 的五字段与 `scan._RULE_META` 逐值一致** —— 同一个 rule_id 不许在代码与 catalog
    里各说一套（`HANDOFF-M3` §二.1 点名要求加这条断言）；
 2. **`MC-H0x/1x` 的五字段与 `headers._RULE_META` 逐值一致**（M3 新落的一簇，同口径）；
-3. **`detector` 必须能在它声明的 `module` 里解析到** —— 否则"这条规则由谁发出"只是一句注释。
+3. **`MC-T*` 的五字段与 `transfer._RULE_META` 逐值一致**（M4 新落的一簇，同口径）；
+4. **`detector` 必须能在它声明的 `module` 里解析到** —— 否则"这条规则由谁发出"只是一句注释。
 
-另有一条**反向覆盖**：两个 `_RULE_META` 里的每个 rule_id 都必须在 catalog 里有行。
+另有一条**反向覆盖**：三个 `_RULE_META` 里的每个 rule_id 都必须在 catalog 里有行。
 只正向比会漏掉"代码里有、catalog 里没有"的规则 —— 那种规则的 `class` 完全不受门禁约束。
 """
 
@@ -17,13 +18,13 @@ import importlib
 
 import pytest
 
-from mimeconform import headers, scan
+from mimeconform import headers, scan, transfer
 from mimeconform.rules import load_catalog
 
 CATALOG = {rule.rule_id: rule for rule in load_catalog()}
 
 #: `_RULE_META` 的形态是 `(class, severity, rfc)`，catalog 的字段名是 `klass`。
-_META_MODULES = {"scan": scan, "headers": headers}
+_META_MODULES = {"scan": scan, "headers": headers, "transfer": transfer}
 
 
 def _meta_pairs(module_name: str) -> list[tuple[str, tuple[str, str, str]]]:
@@ -34,7 +35,7 @@ def _meta_pairs(module_name: str) -> list[tuple[str, tuple[str, str, str]]]:
 
 def test_catalog_is_not_empty() -> None:
     """非空跑自证：下面的逐值比对若在空集上跑是空转。"""
-    assert len(CATALOG) >= 22, f"catalog 只有 {len(CATALOG)} 条规则（M3 后应 ≥ B10 + H12）"
+    assert len(CATALOG) >= 33, f"catalog 只有 {len(CATALOG)} 条规则（M4 后应 ≥ B10 + H12 + T11）"
 
 
 @pytest.mark.parametrize("module_name", sorted(_META_MODULES))
@@ -88,12 +89,18 @@ def test_detector_resolves_in_its_module() -> None:
 
 
 def test_class_distribution_is_what_the_plan_says() -> None:
-    """`plan/03` §二 的 H 簇表点名 5 条 `hard`（H01/H02/H03/H06/H07），其余 7 条降级。
+    """`hard` 的分布必须是**显式决定**，不能漂移。
 
-    这是"原句门禁真的产生了后果"的证据：若哪天有人把 H04 提成 `hard`，
-    上面的门禁会先红；若有人把 H06 降成 `diff`，这条会红（降级必须是显式决定）。
+    * `plan/03` §二 的 H 簇表点名 5 条 `hard`（H01/H02/H03/H06/H07），其余 7 条降级；
+    * `plan/03` §一 的 B 簇表点名 3 条 `hard`（B01/B02/B06）；
+    * `plan/03` §三 的 T 簇表点名 4 条 `hard`（T04 因 R9 子项全录、T05/T06/T07 因 R8 全录），其余 7 条降级。
+
+    这是"原句门禁真的产生了后果"的证据：若哪天有人把 T02 提成 `hard`，
+    上面的门禁会先红；若有人把 T05 降成 `diff`，这条会红（降级必须是显式决定）。
     """
     hard_h = sorted(rule_id for rule_id, rule in CATALOG.items() if rule.rule_id.startswith("MC-H") and rule.klass == "hard")
     assert hard_h == ["MC-H01", "MC-H02", "MC-H03", "MC-H06", "MC-H07"]
     hard_b = sorted(rule_id for rule_id, rule in CATALOG.items() if rule.rule_id.startswith("MC-B") and rule.klass == "hard")
     assert hard_b == ["MC-B01", "MC-B02", "MC-B06"]
+    hard_t = sorted(rule_id for rule_id, rule in CATALOG.items() if rule.rule_id.startswith("MC-T") and rule.klass == "hard")
+    assert hard_t == ["MC-T04", "MC-T05", "MC-T06", "MC-T07"]

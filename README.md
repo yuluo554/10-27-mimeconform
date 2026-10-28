@@ -87,7 +87,7 @@ mimeconform audit data/golden/h-2231-seq/msg.eml --format json
 ```
 
 > 报告里的 `"tree": {"audited_engines": [...], "not_yet_audited": [...]}` 是**覆盖面声明**：
-> 一份干净的账本不等于"所有层都查过了"。未接入的层（`transfer` / `attribution` / `container`）
+> 一份干净的账本不等于"所有层都查过了"。未接入的层（`attribution` / `container`）
 > 的规则**未**参与本次判定。
 
 > `audit` 当前只审计**单封邮件**（`.eml`）。`.mbox` / Maildir 容器与
@@ -148,13 +148,13 @@ TNEF / `winmail.dat` 专向、钓鱼 / URL / 内容安全分析、`.eml` 查看�
 | M1 | 数据先行（机读台账 + golden 语料生成器 + 51 case 语料） | ✅ 完成 |
 | M2 | 树与边界（MC-B） | ✅ 完成 |
 | M3 | 头编码（MC-H）+ 缺陷分类表（人读 + 机读） | ✅ 完成 |
-| M4 | 传输编码（MC-T） | ⬜ 未开始 |
+| M4 | 传输编码（MC-T） | ✅ 完成 |
 | M5 | 归属与容器（MC-A / MC-C） | ⬜ 未开始 |
 | M6 | 发布 | ⬜ 未开始 |
 
 > 本表与 `plan/00`、`plan/05` 逐字一致，由 `tools/check_sprint_layout.py` 断言。
-> 当前 **M3 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B 系列 + 头编码 MC-H 系列），
-> 退出码 0/2/3 均为审计结论。M4–M5 的三个模块（`transfer` / `attribution` /
+> 当前 **M4 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B 系列 + 头编码 MC-H 系列 +
+> 传输编码 MC-T 系列），退出码 0/2/3 均为审计结论。M5 的两个模块（`attribution` /
 > `container`）**仍未实现**，调用即抛 `EngineNotReady` → exit 1——**未实现 ≠ 干净**，
 > 报告里的 `not_yet_audited` 字段同口径声明。
 

@@ -307,10 +307,10 @@ def _engine_available() -> bool:
 
 #: 本轮 `audit` 真正跑过的引擎层（顺序 = 报告里的展示顺序）。
 #: **加模块必须同改这里**，否则报告会把"没查"说成"查过"（`tests/test_cli_contract.py` 断言）。
-_AUDITED_ENGINES: tuple[str, ...] = ("scan", "headers")
+_AUDITED_ENGINES: tuple[str, ...] = ("scan", "headers", "transfer")
 
-#: 仍未接入 `audit` 的引擎层（M4 / M5）。它们仍是 `EngineNotReady`。
-_NOT_YET_AUDITED: tuple[str, ...] = ("transfer", "attribution", "container")
+#: 仍未接入 `audit` 的引擎层（M5）。它们仍是 `EngineNotReady`。
+_NOT_YET_AUDITED: tuple[str, ...] = ("attribution", "container")
 
 
 def _audited_engines() -> tuple[str, ...]:
@@ -405,14 +405,18 @@ def _audit(data: bytes, args: argparse.Namespace):
     """跑本轮已落地的全部引擎面，返回 ``(ScanResult-like, 合并后的缺陷元组)``。
 
     **接线点只有这一处**（`plan/03` §八）：每棒把新落地的模块加进这里，别处不改。
-    M2 = `scan`（树与边界）；M3 = `headers`（头编码）；M4 = `transfer`；M5 = `attribution`/`container`。
+    M2 = `scan`（树与边界）；M3 = `headers`（头编码）；M4 = `transfer`（传输编码）；M5 = `attribution`/`container`。
     """
     from .headers import audit_headers
     from .scan import scan_message
+    from .transfer import audit_transfer
 
     result = scan_message(data, max_depth=args.max_depth, strict_depth=args.strict_depth)
     header_defects = audit_headers(result.root, data)
-    combined = tuple(sorted(result.defects + header_defects, key=lambda item: item.sort_key))
+    transfer_defects = audit_transfer(result.root, data)
+    combined = tuple(
+        sorted(result.defects + header_defects + transfer_defects, key=lambda item: item.sort_key)
+    )
     return result, combined
 
 
