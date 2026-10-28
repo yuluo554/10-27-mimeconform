@@ -18,7 +18,7 @@
 | 布局门 | `py -3.12 -X utf8 tools/check_sprint_layout.py` → 9 条判据全 PASS，`files 14 / sections 8 / handoffs 5 / gap_rows 8 / ledger 1 / doc_tools 3` |
 | 脱敏门 | `py -3.12 -X utf8 tools/check_desensitized.py` → **171 个文本文件，0 命中**（豁免 2 份） |
 | 布局门变异验证 | `py -3.12 -X utf8 tools/verify_layout_gate.py` → **16 组：16 符合预期 / 0 不符**（M5 收尾：M11 改指 `LAYOUT.RELEASE`、新增 M14 作 M13 的反向对照） |
-| 全量测试 | `py -3.12 -X utf8 -m pytest` → **682 passed, 1 skipped**（M4 时 561 passed；新增 `test_golden_engine_attribution.py` 51 条 + `test_golden_engine_container.py` 39 条 + 容器双跑 7 条 + 依赖方向 4 条 + 接线 3 条 + catalog/doc 若干） |
+| 全量测试 | `py -3.12 -X utf8 -m pytest` → **681 passed, 1 skipped**（`--collect-only` = 682 collected；**本轮识别为 D1：682 是 collected 不是 passed**。2026-10-28 二次迭代加入 `tests/test_reported_counts.py` 3 条自指守门后，当前树为 **684 passed**，collect 685。M4 时该口径为 561；新增 `test_golden_engine_attribution.py` 51 条 + `test_golden_engine_container.py` 39 条 + 容器双跑 7 条 + 依赖方向 4 条 + 接线 3 条 + catalog/doc 若干） |
 | 生成器可重建 | `py -3.12 -m mimeconform.devtools.gen_golden --check` → **`51 cases, 0 diff`**（exit 0；c-* 的 README 措辞已随重生成同步） |
 | 语料数据级校验 | `py -3.12 -m mimeconform selftest` → **`51 cases, 0 问题`**（exit 0） |
 | `a-*` 引擎侧 | 9/9 case 命中（**8 正例各 1 条、1 负例 0 条**，共 8 条 A 缺陷），比对键 `rule_id`/`path`/`offset`/`class` |
@@ -139,7 +139,7 @@ Release 有 ≥1 个手工上传附件且 sha256 与本地副本一致；`git st
 | --- | --- | --- |
 | 解释器 | `py -0p` → `3.8-64`（3.8.8）、`3.12-64`（3.12.10） | **3.8 低于本项目下限 3.11，不得用作验证通道** |
 | 跑 Python / 测试 | `py -3.12 -X utf8 -m pytest` | 中文控制台编码；`-X utf8` 只管"我们敲的命令" |
-| 全量测试耗时 | 约 4–5 秒（682 条） | 每改一处都跑全量不心疼 |
+| 全量测试耗时 | 约 5 秒（684 条） | 每改一处都跑全量不心疼 |
 | **`mimeconform` console script** | `shutil.which('mimeconform')` → `None` | 本机**没有**装过 editable。`python -m mimeconform` 可跑；裸命令要等 M6 的 venv 验证。**别写"裸命令已冒烟"** |
 | Git | `2.54.0.windows.1`，`git remote -v` **为空** | 无远端 → 一切"CI 绿"只能写"本地等价校验（未接远端，CI 待首推验证）" |
 | **heredoc 写源码会被拦** | `py - <<'PY'` 改 `.py` 文件被 Mimosa 钩子拒绝 | 改源码一律用 Write/Edit 工具；heredoc 只用来跑只读探针 |
@@ -154,7 +154,7 @@ Release 有 ≥1 个手工上传附件且 sha256 与本地副本一致；`git st
 - [ ] 版本号四处一致；README 状态表 M6 → ✅（与 `plan/00`、`plan/05` 逐字一致）
 - [ ] 干净 venv（仅 CPython）：`pip install --no-build-isolation ".[dev]"` → `mimeconform --version` = 0
 - [ ] README 每条命令在干净 venv 里逐条跑通（含容器两条：`.mbox` / Maildir）
-- [ ] 干净 venv 里 `pytest` 全绿（682 passed）；`selftest --data-dir <repo>/data/golden` = 0
+- [ ] 干净 venv 里 `pytest` 全绿（684 passed）；`selftest --data-dir <repo>/data/golden` = 0
 - [ ] 脱敏四步留档（门输出 / `git ls-files` / 提交身份 / 解包后再扫）
 - [ ] 建仓公开 + CI 首推全绿（4 矩阵 + 离线 job），run id 记进 `plan/RELEASE-M6.md` §二
 - [ ] 手工源码包 + `SHA256SUMS`（两次 `git archive` 逐字节一致）+ 本地留副本
@@ -219,7 +219,7 @@ sha256sum mimeconform-<ver>.tar.gz
 | # | 事项 | 结论 |
 | --- | --- | --- |
 | 1 | 交付面定稿 | 版本 `0.0.0.dev0` → **`1.0.0`**；`pyproject.toml` + `mimeconform/__init__.py` + `README.md` 三处同串，发布包名第四处；classifier 从 `2 - Pre-Alpha` 改 `5 - Production/Stable`；README 安装节补"不发 PyPI、交付形态是 Release 上的手工源码包" |
-| 2 | 干净环境验证 | 仓库外新 venv（仅 CPython + setuptools）→ `pip install --no-build-isolation ".[dev]"` → `mimeconform --version` = `mimeconform 1.0.0` rc 0（**裸命令首次真实可用**）；`python -m mimeconform --version` 同；`selftest --data-dir data/golden` = `51 cases, 0 问题`；`pytest` = `682 passed, 1 skipped`。README 全部命令在**仓库外 cwd** 逐条敲过（`plan/RELEASE-M6.md` §1.3 有 rc 对照表） |
+| 2 | 干净环境验证 | 仓库外新 venv（仅 CPython + setuptools）→ `pip install --no-build-isolation ".[dev]"` → `mimeconform --version` = `mimeconform 1.0.0` rc 0（**裸命令首次真实可用**）；`python -m mimeconform --version` 同；`selftest --data-dir data/golden` = `51 cases, 0 问题`；`pytest` = `684 passed, 1 skipped`（v1.0.0 发布时该口径为 681）。README 全部命令在**仓库外 cwd** 逐条敲过（`plan/RELEASE-M6.md` §1.3 有 rc 对照表） |
 | 3 | 脱敏四步 | 见 §8.2 |
 | 4 | 建仓（公开）+ CI 首推 | 见 §8.3 |
 | 5 | 手工源码包 | 见 §8.4 |

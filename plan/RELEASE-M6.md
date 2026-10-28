@@ -32,7 +32,7 @@ venv 建在仓库外（`%TEMP%` 下的新目录），**未装过 editable**，�
 | 裸 console script | `mimeconform --version` | `mimeconform 1.0.0`，rc=0（**裸命令首次真实可用**） |
 | 模块入口 | `python -m mimeconform --version` | `mimeconform 1.0.0`，rc=0 |
 | 语料自检 | `mimeconform selftest --data-dir <repo>/data/golden` | `51 cases, 0 问题`，rc=0 |
-| 全量测试 | `pytest`（venv 内，仓库根） | `682 passed, 1 skipped`，rc=0 |
+| 全量测试 | `pytest`（venv 内，仓库根） | `681 passed, 1 skipped`，rc=0（`--collect-only` = 682 collected，**682 不是 passed**，见 D1 更正） |
 
 ### 1.3 README 命令逐条实跑（干净 venv，cwd 在仓库外）
 
@@ -61,7 +61,7 @@ venv 建在仓库外（`%TEMP%` 下的新目录），**未装过 editable**，�
 | 布局门 | `tools/check_sprint_layout.py` | 9 条判据全 PASS；`files 14 / sections 8 / handoffs 5 / gap_rows 8 / ledger 1 / doc_tools 3` |
 | 布局门变异自证 | `tools/verify_layout_gate.py` | **16 组：16 符合预期 / 0 不符** |
 | 脱敏门 | `tools/check_desensitized.py` | 172 个文本文件，0 命中（豁免 2 份） |
-| 全量测试 | `pytest` | `682 passed, 1 skipped`（skip = `test_real_catalog_is_absent_and_reports_cleanly`，M3 后由真实门禁取代，遗留为显式 skip） |
+| 全量测试 | `pytest` | `681 passed, 1 skipped`（skip = `test_real_catalog_is_absent_and_reports_cleanly`，M3 后由真实门禁取代，遗留为显式 skip）。**口径**：`collected` 是 `--collect-only` 的数（tag 树里为 **682**）；`passed` = `collected` − skip 数。开发树 1 个 skip（`test_catalog_gate.py` 的 M3 前判据）；解包树 2 个 skip（再加 `test_fixture_hygiene.py` 的"无 `.git` 两态"判据）。**注意**：`collected` 随测试增减而变（tag 之后本地补 `tests/test_reported_counts.py` 3 条 → 685），tag 树的 682 是**发布时点值**，不是恒定约束 |
 | 生成器可重建 | `mimeconform.devtools.gen_golden --check` | `51 cases, 0 diff` |
 | 语料数据级校验 | `mimeconform selftest` | `51 cases, 0 问题` |
 
@@ -158,7 +158,7 @@ M6 真翻 ✅ 之后，这个前提消失 → 三组会变成"期望红实际绿
 | 复算证明（两次 archive） | 同命令连跑两次 → `cmp` **逐字节一致** ✓ |
 | 真下载复核 | `gh release download v1.0.0` 取回的附件与本地副本 `cmp` **逐字节一致** ✓ |
 | 第三路证明 | 从 tag **重新** `git archive \| gzip -9n` → 与下载件 `cmp` **逐字节一致** ✓（不依赖任何写死的值） |
-| 解包树复跑 | 解包（224 个文件、**无 `.git`**）后：布局门 9/9 PASS（handoffs 6、RELEASE 两栏 True / 三态行 35）、脱敏门 173 文件 0 命中、变异自证 **16 组 16 符合预期**、`selftest` `51 cases, 0 问题`、`gen_golden --check` `51 cases, 0 diff`、`pytest` **682 passed / 2 skipped**（多出的 1 个 skip = `test_golden_files_are_committed_only_under_golden` 对无 `.git` 树显式跳过，是设计意图） |
+| 解包树复跑 | 解包（224 个文件、**无 `.git`**）后：布局门 9/9 PASS（handoffs 6、RELEASE 两栏 True / 三态行 35）、脱敏门 173 文件 0 命中、变异自证 **16 组 16 符合预期**、`selftest` `51 cases, 0 问题`、`gen_golden --check` `51 cases, 0 diff`、`pytest` **680 passed / 2 skipped**（`collected` 在 tag 树里为 682；多出的 1 个 skip = `test_fixture_hygiene.py` 的 `test_golden_files_are_committed_only_under_golden` 对无 `.git` 树显式跳过，是设计意图；开发树那 1 个 skip = `test_catalog_gate.py` 的 M3 前判据） |
 
 ### 2.2 tag 与 run
 
@@ -183,6 +183,11 @@ M6 真翻 ✅ 之后，这个前提消失 → 三组会变成"期望红实际绿
   的文件清单全部以 `plan/` 开头（2.2 表已记实测清单）。本笔回填自身的 run 为
   `40633503969`（success），**仅作过程事实登记**：它不参与 2.2 的"push 数 = run 数"对账
   （那条只对账到 tag push），因为每写一次都会再添一笔。
+- **tag 消息更正（D1）**：`v1.0.0` 的 annotated tag 消息把 **collected 数（`682`）** 误印成了 passed 数；
+  实际为 **681 passed / 1 skipped**（开发树），tag 树解包后为 **680 passed / 2 skipped**。
+  按纪律**不改写已发布 tag 消息**（改写会破坏「附件与 tag 树同源」），以本行作为书面更正。根因见 §1.4 的 `addopts` 口径：`-q` 叠加成 `-qq` 后看不见汇总行，
+  只能抄 `--collect-only` 的 collected 数；本轮已删 `addopts = "-q"` 并加
+  `tests/test_reported_counts.py` 守着这类数字。
 - **覆盖对账的 7 条 `待首推` 归宿**（对应 §1.7 的 #1 / #6 / #23 / #24 / #25 / #26 / #27）：
   首推与 tag push 均全绿（run id 见 2.2），逐条已由真实 run 证；#6 的"解包树里逐条敲 README"
   与 #1 的"真下载 + 中立目录"在 2.1 的"解包树复跑 / 真下载复核 / 第三路证明"三行里完成。
