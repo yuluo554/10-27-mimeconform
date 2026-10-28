@@ -186,11 +186,11 @@ MUTATIONS: tuple[Mutation, ...] = (
         "LAYOUT.STATUS",
     ),
     Mutation(
-        "M11 发布里程碑 M6 翻 ✅ 但删留档（构造'缺档 + 已 ✅'）",
+        "M11 发布里程碑 M6 翻 ✅ 但缺发布留档 → LAYOUT.RELEASE 必红",
         "plan/00-README总览.md",
         "| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |",
         "| **M6 发布** | 干净环境验证 + 发布 | ✅ 完成 |",
-        "LAYOUT.HANDOFFS",
+        "LAYOUT.RELEASE",
     ),
     Mutation(
         "M12 门自己的用法错误必须 rc=2（不用文件变异，见 verify_one）",
@@ -201,17 +201,40 @@ MUTATIONS: tuple[Mutation, ...] = (
         expect_green=True,
     ),
     Mutation(
-        "M13 豁免分支的正向证明：置 HANDOFF_EXEMPT_LAST=true 后末棒无交接单也放行",
-        "plan/00-README总览.md",
-        "| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |",
-        "| **M6 发布** | 干净环境验证 + 发布 | ✅ 完成 |",
+        "M13 豁免分支的正向证明：HANDOFF_EXEMPT_LAST=true 时末棒缺交接单仍放行",
+        "plan/HANDOFF-M6.md",
+        "# HANDOFF-M6 — 进入 M6（发布）的收尾交接单",
+        "",
         "LAYOUT.HANDOFFS",
+        kind="delete",
         expect_green=True,
-        extras=((
-            "tools/check_sprint_layout.py",
-            "HANDOFF_EXEMPT_LAST = False",
-            "HANDOFF_EXEMPT_LAST = True",
-        ),),
+        extras=(
+            (
+                "plan/00-README总览.md",
+                "| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |",
+                "| **M6 发布** | 干净环境验证 + 发布 | ✅ 完成 |",
+            ),
+            (
+                "tools/check_sprint_layout.py",
+                "HANDOFF_EXEMPT_LAST = False",
+                "HANDOFF_EXEMPT_LAST = True",
+            ),
+        ),
+    ),
+    Mutation(
+        "M14 已 ✅ 的里程碑缺交接单 → LAYOUT.HANDOFFS 必红（M13 的反向对照）",
+        "plan/HANDOFF-M6.md",
+        "# HANDOFF-M6 — 进入 M6（发布）的收尾交接单",
+        "",
+        "LAYOUT.HANDOFFS",
+        kind="delete",
+        extras=(
+            (
+                "plan/00-README总览.md",
+                "| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |",
+                "| **M6 发布** | 干净环境验证 + 发布 | ✅ 完成 |",
+            ),
+        ),
     ),
 )
 

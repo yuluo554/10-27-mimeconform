@@ -160,6 +160,34 @@ def test_scan_does_not_import_higher_layers() -> None:
     assert not offenders, f"scan.py 导入了上层模块（{sorted(offenders)}）：反向依赖会让分层失效。"
 
 
+def test_attribution_does_not_import_higher_layers() -> None:
+    """依赖方向：`attribution.py` 可 import `headers`（取 filename），**不得**上行。
+
+    `HANDOFF-M5` §二.11：分层纪律同样适用于 `attribution` / `container` —— 只查 `scan` 会漏掉
+    "新模块悄悄反向依赖"这条最可能的漂移。
+    """
+    names = _imported_names(_parse(PKG / "attribution.py"))
+    forbidden = {"scan", "transfer", "container", "report", "cli"}
+    offenders = {n for n in names if n.split(".")[-1] in forbidden}
+    assert not offenders, f"attribution.py 导入了不该 import 的模块（{sorted(offenders)}）。"
+
+
+def test_container_does_not_import_higher_layers() -> None:
+    """依赖方向：`container.py` 在最底层 —— 不得 import 任何业务模块（只看容器字节）。"""
+    names = _imported_names(_parse(PKG / "container.py"))
+    forbidden = {"scan", "headers", "transfer", "attribution", "report", "cli"}
+    offenders = {n for n in names if n.split(".")[-1] in forbidden}
+    assert not offenders, f"container.py 导入了上层模块（{sorted(offenders)}）。"
+
+
+def test_transfer_and_attribution_do_not_import_each_other() -> None:
+    """`transfer` 与 `attribution` 是同层，互不依赖（同层互相 import 会把分层变成一张网）。"""
+    for name, other in (("transfer.py", "attribution"), ("attribution.py", "transfer")):
+        names = _imported_names(_parse(PKG / name))
+        offenders = {n for n in names if n.split(".")[-1] == other}
+        assert not offenders, f"{name} import 了同层的 {other}（{sorted(offenders)}）。"
+
+
 def test_probe_self_check(tmp_path: Path) -> None:
     """**探针自证**：每个被禁形态都必须能被检出，否则守门是假门。"""
     samples = {

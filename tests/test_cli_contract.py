@@ -4,8 +4,9 @@
 输入不可读）、**2**（审计完成且只有 `minor`）、**3**（`major`/`blocker`）。
 
 **骨架期语义已被替换而非删除**（plan/00 D16）：那时 `audit` 对任何输入都 exit 1，
-用来证明"未实现 ≠ 干净"。M2 起 `scan` 已落地、M3 起 `headers`、M4 起 `transfer`，于是 D16 的活口改成
-`test_unimplemented_engines_still_fail_loudly` —— 仍未实现的两个模块必须继续显式失败。
+用来证明"未实现 ≠ 干净"。M2 起 `scan`、M3 起 `headers`、M4 起 `transfer`、M5 起
+`attribution` / `container` 全部落地，于是 D16 的活口改成
+`test_no_engine_remains_unwired` —— 五个模块全接入、`_NOT_YET_AUDITED` 为空。
 """
 
 from __future__ import annotations
@@ -172,23 +173,22 @@ def _empty_node():
     )
 
 
-def test_unimplemented_engines_still_fail_loudly() -> None:
-    """M5 的两个模块仍未实现 → 调用即抛 `EngineNotReady`，绝不静默返回。
+def test_no_engine_remains_unwired() -> None:
+    """M5 收口：五个引擎层全部落地并接线 —— "未实现 ≠ 干净" 的活口改为"空起点"。
 
-    D16 的语义没有随里程碑消失，只是从 `audit` 搬到了这些模块上：**未实现 ≠ 干净**。
-    M3 起 `headers` 已落地、M4 起 `transfer` 已落地，因此它们从这里移出，
-    改由正向断言（`test_headers_engine_is_wired_into_audit` /
-    `test_transfer_engine_is_wired_into_audit`）覆盖 —— 接线与"仍未实现"是两份证据。
+    D16 的语义没有随里程碑消失：`EngineNotReady` 仍是自家异常体系的一员（下面还有断言），
+    只是**现在没有模块再用它**。清单与"本次真跑过哪些"是两份证据（后者见各接线断言）。
     """
     from mimeconform import attribution, container
+    from mimeconform.cli import _AUDITED_ENGINES, _MESSAGE_ENGINES, _NOT_YET_AUDITED, _audited_engines
 
-    calls = (
-        lambda: attribution.audit_attribution(_empty_node()),
-        lambda: container.split_container(b"From a@example.invalid x\n"),
-    )
-    for call in calls:
-        with pytest.raises(EngineNotReady, match="尚未实现"):
-            call()
+    assert _NOT_YET_AUDITED == (), "五个模块全部接入后不该还有『尚未接入』的引擎"
+    assert _AUDITED_ENGINES == ("scan", "headers", "transfer", "attribution", "container")
+    assert set(_MESSAGE_ENGINES) == set(_AUDITED_ENGINES) - {"container"}
+    assert _audited_engines() == _AUDITED_ENGINES
+    # 两个模块现在真的能跑（不再抛 EngineNotReady）。
+    assert attribution.audit_attribution(_empty_node(), b"").defects == ()
+    assert container.split_container(b"").defects == ()
 
 
 def test_headers_engine_is_wired_into_audit(tmp_path: Path) -> None:
@@ -202,8 +202,9 @@ def test_headers_engine_is_wired_into_audit(tmp_path: Path) -> None:
     assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_MINOR
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert [d["rule_id"] for d in payload["defects"]] == ["MC-H03"], "头编码缺陷必须出现在 report 里"
-    assert payload["tree"]["audited_engines"] == ["scan", "headers", "transfer"]
-    assert payload["tree"]["not_yet_audited"] == ["attribution", "container"]
+    assert payload["tree"]["audited_engines"] == ["scan", "headers", "transfer", "attribution"]
+    assert payload["tree"]["not_yet_audited"] == []
+    assert payload["tree"]["not_applicable"] == ["container"], "单封消息不跑容器层，必须自己说出来"
 
 
 def test_transfer_engine_is_wired_into_audit(tmp_path: Path) -> None:
@@ -217,8 +218,58 @@ def test_transfer_engine_is_wired_into_audit(tmp_path: Path) -> None:
     assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_MAJOR
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert sorted({d["rule_id"] for d in payload["defects"]}) == ["MC-T07"], payload["defects"]
-    assert payload["tree"]["audited_engines"] == ["scan", "headers", "transfer"]
-    assert payload["tree"]["not_yet_audited"] == ["attribution", "container"]
+    assert payload["tree"]["audited_engines"] == ["scan", "headers", "transfer", "attribution"]
+    assert payload["tree"]["not_yet_audited"] == []
+
+
+def test_attribution_engine_is_wired_into_audit(tmp_path: Path) -> None:
+    """M5 的接线证据（一）：`audit` 必须真的跑 `attribution`（SO 6255202 的 MC-A01 出现在报告里）。"""
+    case = GOLDEN / "a-body-attach" / "msg.eml"
+    out = tmp_path / "a.json"
+    assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_OK
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert [d["rule_id"] for d in payload["defects"]] == ["MC-A01"], payload["defects"]
+    assert payload["tree"]["audited_engines"] == ["scan", "headers", "transfer", "attribution"]
+    attachments = payload["tree"]["attachments"]
+    assert {row["path"] for row in attachments} == {"0.1", "0.2"}
+
+
+def test_container_engine_is_wired_into_audit(tmp_path: Path) -> None:
+    """M5 的接线证据（二）：`.mbox` 输入走容器路径，`split_variants` 三种读法全部出现在报告里。
+
+    容器模式只审计容器层（MC-C）；报告必须自己声明逐消息的 MIME 引擎未参与本次判定。
+    """
+    case = GOLDEN / "c-from-unescaped" / "mail.mbox"
+    out = tmp_path / "c.json"
+    assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_OK
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert [d["rule_id"] for d in payload["defects"]] == ["MC-C02"]
+    tree = payload["tree"]
+    assert tree["mode"] == "container"
+    assert tree["primary_variant"] == "mboxcl"
+    assert tree["variant_counts"] == {"mboxo": 3, "mboxrd": 3, "mboxcl": 2}
+    assert set(tree["split_variants"]) == {"mboxo", "mboxrd", "mboxcl"}
+    assert tree["audited_engines"] == ["container"]
+    assert tree["not_yet_audited"] == []
+    assert set(tree["not_applicable"]) == {"scan", "headers", "transfer", "attribution"}
+
+
+def test_maildir_input_is_wired_into_audit(tmp_path: Path) -> None:
+    """目录输入 = Maildir 容器：MC-C05 出现在报告里（输入摘要按条目拼接）。"""
+    case = GOLDEN / "c-maildir-name" / "maildir"
+    out = tmp_path / "m.json"
+    assert main(["audit", str(case), "--out", str(out)]) == C.EXIT_OK
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert [d["rule_id"] for d in payload["defects"]] == ["MC-C05"]
+    assert payload["tree"]["container_kind"] == "maildir"
+
+
+def test_container_mode_on_a_non_container_fails_loudly(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """`--container` 指一个不是 mbox 的文件 → exit 1（空分母 ≠ 通过）。"""
+    plain = tmp_path / "plain.txt"
+    plain.write_bytes(b"Subject: not a container\n\nbody\n")
+    assert main(["audit", str(plain), "--container"]) == C.EXIT_USAGE
+    assert "没有找到任何 mbox 消息" in capsys.readouterr().err
 
 
 def test_headers_and_tree_defects_share_one_ledger() -> None:
@@ -232,7 +283,7 @@ def test_headers_and_tree_defects_share_one_ledger() -> None:
         b"\r\n--b\r\n\r\nbody\r\n"
     )
     args = build_parser().parse_args(["audit", "x.eml"])
-    _result, defects = _audit(data, args)
+    _result, defects, _attribution = _audit(data, args)
     rules = {defect.rule_id for defect in defects}
     assert "MC-H03" in rules, f"H 簇缺陷没进台账：{sorted(rules)}"
     assert "MC-B05" in rules, f"B 簇缺陷也在同一批里：{sorted(rules)}"

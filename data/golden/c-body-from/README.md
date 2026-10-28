@@ -4,7 +4,7 @@
 - 来源：自造容器样本（无外部来源）
 - 输入：`mail.mbox`（261 bytes；sha256 `416295b45487a2b8d9287929df65740da42aa9775ff661312326ff71be66e6f8`）
 - 期望指纹：`84f4552e673bc0d98b2050d3abb723a3a896b1525628ef5df66a6fcf19ef16d1`
-- 树指纹：`None`（容器输入，自 M5 起回填）
+- 树指纹：`None`（容器输入：§7.8 的 tree_digest 主语是一棵树，容器不适用）
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/c-body-from/mail.mbox`

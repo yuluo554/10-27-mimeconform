@@ -23,8 +23,11 @@ from mimeconform.model import Defect
 from mimeconform.report import render_json, render_markdown
 
 ROOT = Path(__file__).resolve().parents[1]
-#: 单封邮件输入（容器输入由 M5 的扫描入口负责，届时另补一组）。
+#: 单封邮件输入（容器输入另有一组，见下文 `CONTAINER_INPUTS`）。
 EML_INPUTS = sorted((ROOT / "data" / "golden").glob("*/*.eml"))
+#: 容器输入（M5 起）：`.mbox` 文件 + Maildir 目录（目录取 `cur/` / `new/` / `tmp/` 下的条目）。
+MBOX_INPUTS = sorted((ROOT / "data" / "golden").glob("*/*.mbox"))
+MAILDIR_INPUTS = sorted(path for path in (ROOT / "data" / "golden").glob("*/maildir") if path.is_dir())
 
 
 def sample_ledger() -> dict[str, object]:
@@ -141,16 +144,40 @@ def test_json_uses_ascii_escapes_for_non_ascii() -> None:
 
 
 def _engine_ledger_bytes(path: Path) -> bytes:
-    """跑完整链路（扫描 + 头编码 + 传输编码 → 台账 → 序列化）并返回产物字节。"""
+    """跑完整单封链路（扫描 + 头编码 + 传输编码 + 归属 → 台账 → 序列化）并返回产物字节。"""
+    from mimeconform.attribution import audit_attribution
     from mimeconform.headers import audit_headers
     from mimeconform.scan import scan_message
     from mimeconform.transfer import audit_transfer
 
     data = path.read_bytes()
     result = scan_message(data)
-    defects = tuple(result.defects) + audit_headers(result.root, data) + audit_transfer(result.root, data)
+    defects = (
+        tuple(result.defects)
+        + audit_headers(result.root, data)
+        + audit_transfer(result.root, data)
+        + audit_attribution(result.root, data).defects
+    )
     ledger = build(defects, result.root)
     return dumps(ledger).encode("utf-8")
+
+
+def _container_ledger_bytes(path: Path) -> bytes:
+    """跑完整容器链路（切分/变体表 → 台账 → 序列化）并返回产物字节。"""
+    from mimeconform.container import audit_maildir, split_container
+
+    if path.is_dir():
+        result = audit_maildir(path)
+    else:
+        result = split_container(path.read_bytes(), variant=C.MBOX_VARIANT_DEFAULT)
+    ledger = build(result.defects)
+    payload = {
+        "ledger": ledger,
+        "primary_variant": result.primary_variant,
+        "variant_counts": {name: len(spans) for name, spans in result.split_variants.items()},
+        "entries": list(result.entries),
+    }
+    return dumps(payload).encode("utf-8")
 
 
 def test_eml_corpus_exposes_a_nonempty_denominator() -> None:
@@ -162,6 +189,18 @@ def test_eml_corpus_exposes_a_nonempty_denominator() -> None:
 def test_engine_double_run_is_byte_identical(path: Path) -> None:
     """同一输入双跑 → 账本字节逐字节一致（plan/05 §二 M2 DoD）。"""
     assert _engine_ledger_bytes(path) == _engine_ledger_bytes(path)
+
+
+def test_container_corpus_exposes_a_nonempty_denominator() -> None:
+    """非空跑自证：没有容器输入时下面的判据是空转的。"""
+    assert len(MBOX_INPUTS) >= 5, f"只扫到 {len(MBOX_INPUTS)} 个 .mbox 输入"
+    assert len(MAILDIR_INPUTS) >= 1, f"只扫到 {len(MAILDIR_INPUTS)} 个 Maildir 目录"
+
+
+@pytest.mark.parametrize("path", MBOX_INPUTS + MAILDIR_INPUTS, ids=lambda p: p.parent.name)
+def test_container_double_run_is_byte_identical(path: Path) -> None:
+    """容器路径（切分表 + 变体条数 + 台账）双跑逐字节一致（M5 DoD）。"""
+    assert _container_ledger_bytes(path) == _container_ledger_bytes(path)
 
 
 def test_engine_output_has_no_environment_fingerprints() -> None:

@@ -29,9 +29,48 @@ def _header_lines(input_name: str, input_bytes: int, input_sha256: str, exit_cod
     ]
 
 
+def _coverage_lines(tree_info: dict[str, object]) -> list[str]:
+    """覆盖面声明（**只搬运**）：本轮真跑过哪些引擎层、哪些不适用。"""
+    lines: list[str] = []
+    engines = tree_info.get("audited_engines")
+    if isinstance(engines, list) and engines:
+        # 覆盖面必须自己说出来：一份干净的账本不等于"所有层都查过了"。
+        lines.append(f"- 本轮已审计的引擎层: {', '.join(f'`{name}`' for name in engines)}")
+    pending = tree_info.get("not_yet_audited")
+    if isinstance(pending, list) and pending:
+        lines.append(
+            f"- 尚未接入（其规则**未**参与本次判定）: {', '.join(f'`{name}`' for name in pending)}"
+        )
+    unused = tree_info.get("not_applicable")
+    if isinstance(unused, list) and unused:
+        lines.append(f"- 本次输入不适用（其规则**未**参与本次判定）: {', '.join(f'`{name}`' for name in unused)}")
+    note = tree_info.get("not_applicable_note")
+    if note:
+        lines.append(f"- 覆盖面说明: {note}")
+    return lines
+
+
 def _tree_section(tree_info: dict[str, object]) -> list[str]:
     """结构事实小节的排版（**只搬运**：所有值都来自 ``tree_info``）。"""
     lines = ["## 结构事实", ""]
+    if tree_info.get("mode") == "container":
+        lines.append(f"- 输入形态: 容器（`{tree_info.get('container_kind')}`）")
+        lines.append(f"- 主表读法: `{tree_info.get('primary_variant')}`")
+        counts = tree_info.get("variant_counts")
+        if isinstance(counts, dict) and counts:
+            lines.append(
+                "- 各读法下的消息条数: " + " · ".join(f"{name} {counts[name]}" for name in sorted(counts))
+            )
+        entries = tree_info.get("entries")
+        if isinstance(entries, list) and entries:
+            lines.append(f"- Maildir 条目: {', '.join(f'`{name}`' for name in entries)}")
+        note = tree_info.get("note")
+        if note:
+            lines.append(f"- 变体说明: {note}")
+        lines.extend(_coverage_lines(tree_info))
+        lines.append("")
+        return lines
+
     lines.append(f"- 展示树语义: `{tree_info.get('mode')}`")
     lines.append(f"- 节点数: {tree_info.get('node_count')}")
     lines.append(f"- 候选树数量: {tree_info.get('tree_alternatives')}")
@@ -47,15 +86,10 @@ def _tree_section(tree_info: dict[str, object]) -> list[str]:
     truncated = tree_info.get("truncated_paths")
     if isinstance(truncated, list) and truncated:
         lines.append(f"- 超深度停止下钻的路径: {', '.join(f'`{p}`' for p in truncated)}")
-    engines = tree_info.get("audited_engines")
-    if isinstance(engines, list) and engines:
-        # 覆盖面必须自己说出来：一份干净的账本不等于"所有层都查过了"。
-        lines.append(f"- 本轮已审计的引擎层: {', '.join(f'`{name}`' for name in engines)}")
-    pending = tree_info.get("not_yet_audited")
-    if isinstance(pending, list) and pending:
-        lines.append(
-            f"- 尚未接入（其规则**未**参与本次判定）: {', '.join(f'`{name}`' for name in pending)}"
-        )
+    attachments = tree_info.get("attachments")
+    if isinstance(attachments, list) and attachments:
+        lines.append(f"- 归属事实（叶节点）: {len(attachments)} 个")
+    lines.extend(_coverage_lines(tree_info))
     lines.append("")
     return lines
 
@@ -128,7 +162,13 @@ def render_markdown(
     lines.append(f"- 按 severity: {sev_text}")
     lines.append(f"- 无条款支撑（{C.RFC_NONE_BY_DESIGN}）: {ledger['none_by_design']}")
     lines.append(f"- 缺陷集指纹: `{ledger['fingerprint']}`")
-    lines.append(f"- 树指纹: `{ledger['tree_digest']}`")
+    tree_digest_value = ledger["tree_digest"]
+    if tree_digest_value is None:
+        # 容器输入的树指纹按 §7.8 **不适用**（该字段的主语是一棵树）。这里只是排版：
+        # 不参与判定，也不把"不适用"渲染成看起来像失败的 None。
+        lines.append("- 树指纹: 不适用（容器输入）")
+    else:
+        lines.append(f"- 树指纹: `{tree_digest_value}`")
     lines.append("")
 
     if tree_info is not None:

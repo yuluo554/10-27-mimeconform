@@ -92,12 +92,26 @@ def test_doc_class_and_severity_match_catalog(rule_id: str) -> None:
     assert severity == rule.severity, f"{rule_id}: 文档 severity={severity!r} catalog={rule.severity!r}"
 
 
-def test_doc_names_the_uncovered_clusters_honestly() -> None:
-    """未落地的簇必须在文档里显式标注（不能让人读成"全查过了"）。"""
+def test_doc_declares_all_five_clusters_as_covered() -> None:
+    """M5 收口：五个簇都必须被标成"已覆盖"，且不得再把已落地的簇标成 ⬜。
+
+    这条的前身是 M3 的 `test_doc_names_the_uncovered_clusters_honestly`（那时 A/C 未落地，
+    文档必须显式标注 ⬜）。里程碑翻 ✅ 后判据随之翻转 —— **留 ⬜ 会变成"已完成却说自己没做"的
+    反向假账**，与"未落地却说做了"是同一类错误。
+    """
     text = DOC.read_text(encoding="utf-8")
     for token in ("T 传输编码", "A 归属与引用", "C 容器"):
-        assert token in text, f"文档没有如实标注未覆盖的簇: {token}"
-    assert "⬜" in text, "未覆盖的簇必须用 ⬜ 标记"
+        assert token in text, f"文档没有覆盖该簇: {token}"
+
+    # 覆盖总览表：五行簇逐个 ✅（扩展项允许 ⬜）。
+    cluster_rows = [
+        line
+        for line in text.split("\n")
+        if line.startswith("|") and any(key in line for key in ("`scan.py`", "`headers.py`", "`transfer.py`", "`attribution.py`", "`container.py`"))
+    ]
+    assert len(cluster_rows) == 5, f"覆盖总览表应扫到 5 个簇行，实际 {len(cluster_rows)}"
+    offenders = [row for row in cluster_rows if "✅" not in row or "⬜" in row]
+    assert not offenders, "已落地的簇仍被标成未完成：" + "；".join(row.strip() for row in offenders)
 
 
 def test_doc_states_the_2231_judgement_order() -> None:

@@ -20,7 +20,8 @@
 3. ``tree_digest`` 自 M2 起**由引擎回填**（同算法 ``ledger.tree_digest``）：它是"解析结果"
    的回归基线，只有真跑一遍扫描才可能得到真值 —— 缺陷集仍是手写常量（两者分家：
    ``defects`` 判"判定对不对"，``tree_digest`` 判"解析有没有变"）。
-   容器类输入（``mail.mbox`` / Maildir）不走单封扫描，其 ``tree_digest`` 保持在 M5 回填。
+   容器类输入（``mail.mbox`` / Maildir）不走单封扫描，其 ``tree_digest`` **恒为 null**；
+   M5 裁决：§7.8 的该字段主语是一棵树，容器不适用（理由见 `_tree_digest_for`）。
 4. README 一律用 **issue / SO 编号** 指来源，**不写 URL、不写真实域名**（隐私红线与
    扫描门 `tests/test_fixture_hygiene.py` 的要求；`example.invalid` 是唯一允许的域）。
 
@@ -197,10 +198,15 @@ def _case(
 
 
 def _tree_digest_for(infile: str, data: bytes) -> str | None:
-    """单封邮件输入的树指纹（M2 起回填）；容器输入留给 M5。
+    """单封邮件输入的树指纹（M2 起回填）；容器输入恒为 ``None``（**M5 裁决**）。
 
-    为什么容器输入不回填：``scan_message`` 的输入契约是**一封消息**，而 mbox / Maildir 是
-    多消息容器 —— 直接喂进去只会得到一个"切分前"的伪树，把它当基线等于给 M5 埋一个假绿。
+    为什么容器输入**不**回填：§7.8 的 ``tree_digest`` 定义是"把**每个节点**规范化为
+    ``[path, content_type, boundary, body_sha256]`` 后排序取 sha256" —— 它的主语是**一棵树**。
+    mbox / Maildir 是多消息容器：要么给每封消息各算一个（就没有"容器的树指纹"这一说），
+    要么临时发明一个"多棵树的合并摘要"（那是新口径，必须先进 `data/README` §7.8，不能在
+    生成器里悄悄造）。两种做法都会让 ``expect.json`` 的同一个字段在不同 case 上语义不一致 ——
+    那正是"假绿"的来源。故此处**显式**返回 ``None``，报告里渲染成"不适用"，而不是留一个看起来
+    像失败的空白。
     """
     if not infile.endswith(".eml"):
         return None
@@ -226,7 +232,7 @@ def _render_readme(name: str, expect: dict[str, object]) -> bytes:
         f"- 输入：`{input_info['file']}`（{input_info['bytes']} bytes；sha256 `{input_info['sha256']}`）",
         f"- 期望指纹：`{expect['fingerprint']}`",
         f"- 树指纹：`{expect['tree_digest']}`"
-        + ("" if expect["tree_digest"] else "（容器输入，自 M5 起回填）"),
+        + ("" if expect["tree_digest"] else "（容器输入：§7.8 的 tree_digest 主语是一棵树，容器不适用）"),
         "- 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）",
         "- 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`",
         f"- 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/{name}/{input_info['file']}`",

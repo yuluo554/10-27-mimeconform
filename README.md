@@ -55,10 +55,12 @@ mimeconform --version
 mimeconform audit sample.eml                      # 账本写 stdout（JSON + Markdown）
 mimeconform audit sample.eml --out report.json    # 按扩展名挑格式
 mimeconform audit sample.eml --out reports/       # 目录形态：两种格式都写
+mimeconform audit sample.mbox --format json       # 容器（mbox）：三种读法的切分表一起出
+mimeconform audit ./maildir --format json         # 容器（Maildir 目录）
 mimeconform selftest                              # 校验 golden 语料自洽性
 ```
 
-### 三个可照抄的场景（当前能力：单封 `.eml` 的树与边界 + 头编码）
+### 三个可照抄的场景（单封 `.eml`：树与边界 + 头编码 + 传输编码 + 归属）
 
 ```bash
 # 场景 1：内层 boundary 与外层重复（cpython #69914）→ 退出码 3 + 两棵候选树
@@ -69,30 +71,41 @@ mimeconform audit data/golden/b-inner-dup/msg.eml --out /tmp/dup.json
 # 场景 2：干净嵌套（负例）→ 退出码 0，缺陷数 0
 mimeconform audit data/golden/b-clean-nested/msg.eml --format json
 
-# 场景 3：缺 final boundary → 退出码 0（仅 diff/note 登记），报告给出"被迫闭合"的字节位置
-mimeconform audit data/golden/b-no-final/msg.eml --format md
+# 场景 3：文本附件被当正文（SO 6255202）→ MC-A01（diff/note），退出码 0
+mimeconform audit data/golden/a-body-attach/msg.eml --format md
 ```
 
-### 头编码（M3 起可跑）
+### 头编码 / 传输编码（M3 / M4 起可跑）
 
 ```bash
 # encoded-word 内折行（SO 52442469）→ 只报 MC-H12，被压掉的 MC-H03 进 related
 mimeconform audit data/golden/h-ew-newline/msg.eml --format json
 
-# 头行 > 998 octets → MC-H07（hard/major）→ 退出码 3
-mimeconform audit data/golden/h-line-998/msg.eml --format md
-
-# 缺 *0 序号的附件名（SO 44154520）→ MC-H09（diff/note，退出码仍 0）+ 修正提示文本
-mimeconform audit data/golden/h-2231-seq/msg.eml --format json
+# QP 伪影（SO 79133579）→ MC-T07 hard/major ×3，退出码 3
+mimeconform audit data/golden/t-qp-artifact/msg.eml --format json
 ```
 
-> 报告里的 `"tree": {"audited_engines": [...], "not_yet_audited": [...]}` 是**覆盖面声明**：
-> 一份干净的账本不等于"所有层都查过了"。未接入的层（`attribution` / `container`）
-> 的规则**未**参与本次判定。
+### 归属与容器（M5 起可跑）
 
-> `audit` 当前只审计**单封邮件**（`.eml`）。`.mbox` / Maildir 容器与
-> `--container` / `--mbox-variant` 自里程碑 M5 起支持；此刻传目录会得到 exit 1
-> 并明确说明"容器层自 M5 起支持"。
+```bash
+# 正文 cid: 引用没有对应 Content-ID（SO 10107788）→ MC-A04
+mimeconform audit data/golden/a-cid-open/msg.eml --format json
+
+# mbox：正文里裸 `From ` 行 → MC-C02；报告同时给 mboxo/mboxrd/mboxcl 三张切分表
+mimeconform audit data/golden/c-from-unescaped/mail.mbox --format json
+
+# 畸形 `From ` 分隔行（cpython #93376）→ MC-C01
+mimeconform audit data/golden/c-from-bad/mail.mbox --mbox-variant mboxo --format md
+```
+
+> 报告里的 `"tree": {"audited_engines": [...], "not_yet_audited": [], "not_applicable": [...]}`
+> 是**覆盖面声明**：一份干净的账本不等于"所有层都查过了"。单封 `.eml` 路径跑
+> `scan`/`headers`/`transfer`/`attribution`（容器层不适用）；`.mbox` / Maildir 路径只跑
+> `container`（逐消息的 MIME 引擎不在本轮容器路径内），两种情形都在报告里写明。
+
+**容器输入**：`--container` 显式声明，或按形态自动判定（目录 = Maildir；`.mbox` 扩展名 = mbox）。
+`.mbox` 模式下**三种读法的切分表都输出**（`split_variants`），`--mbox-variant` 只决定主表；
+找不到任何消息时 exit 1（空分母 ≠ 通过）。
 
 **退出码**（`data/README.md` §7.9 是唯一定义）：
 
@@ -149,14 +162,13 @@ TNEF / `winmail.dat` 专向、钓鱼 / URL / 内容安全分析、`.eml` 查看�
 | M2 | 树与边界（MC-B） | ✅ 完成 |
 | M3 | 头编码（MC-H）+ 缺陷分类表（人读 + 机读） | ✅ 完成 |
 | M4 | 传输编码（MC-T） | ✅ 完成 |
-| M5 | 归属与容器（MC-A / MC-C） | ⬜ 未开始 |
+| M5 | 归属与容器（MC-A / MC-C） | ✅ 完成 |
 | M6 | 发布 | ⬜ 未开始 |
 
 > 本表与 `plan/00`、`plan/05` 逐字一致，由 `tools/check_sprint_layout.py` 断言。
-> 当前 **M4 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B 系列 + 头编码 MC-H 系列 +
-> 传输编码 MC-T 系列），退出码 0/2/3 均为审计结论。M5 的两个模块（`attribution` /
-> `container`）**仍未实现**，调用即抛 `EngineNotReady` → exit 1——**未实现 ≠ 干净**，
-> 报告里的 `not_yet_audited` 字段同口径声明。
+> 当前 **M5 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B + 头编码 MC-H +
+> 传输编码 MC-T + 归属与引用 MC-A），也可对 `.mbox` / Maildir 真跑容器层（MC-C，三变体切分表并出）；
+> 五个引擎层全部接入，`not_yet_audited` 恒为空。缺陷分类表 46 条（B10 + H12 + T11 + A8 + C5）。
 
 ---
 

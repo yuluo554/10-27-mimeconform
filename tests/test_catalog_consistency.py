@@ -18,13 +18,19 @@ import importlib
 
 import pytest
 
-from mimeconform import headers, scan, transfer
+from mimeconform import attribution, container, headers, scan, transfer
 from mimeconform.rules import load_catalog
 
 CATALOG = {rule.rule_id: rule for rule in load_catalog()}
 
 #: `_RULE_META` 的形态是 `(class, severity, rfc)`，catalog 的字段名是 `klass`。
-_META_MODULES = {"scan": scan, "headers": headers, "transfer": transfer}
+_META_MODULES = {
+    "scan": scan,
+    "headers": headers,
+    "transfer": transfer,
+    "attribution": attribution,
+    "container": container,
+}
 
 
 def _meta_pairs(module_name: str) -> list[tuple[str, tuple[str, str, str]]]:
@@ -35,7 +41,7 @@ def _meta_pairs(module_name: str) -> list[tuple[str, tuple[str, str, str]]]:
 
 def test_catalog_is_not_empty() -> None:
     """非空跑自证：下面的逐值比对若在空集上跑是空转。"""
-    assert len(CATALOG) >= 33, f"catalog 只有 {len(CATALOG)} 条规则（M4 后应 ≥ B10 + H12 + T11）"
+    assert len(CATALOG) >= 46, f"catalog 只有 {len(CATALOG)} 条规则（M5 后应 ≥ B10 + H12 + T11 + A8 + C5）"
 
 
 @pytest.mark.parametrize("module_name", sorted(_META_MODULES))
@@ -104,3 +110,10 @@ def test_class_distribution_is_what_the_plan_says() -> None:
     assert hard_b == ["MC-B01", "MC-B02", "MC-B06"]
     hard_t = sorted(rule_id for rule_id, rule in CATALOG.items() if rule.rule_id.startswith("MC-T") and rule.klass == "hard")
     assert hard_t == ["MC-T04", "MC-T05", "MC-T06", "MC-T07"]
+    # A / C 两簇是语义层（`Content-Disposition` / `multipart/related` / mbox / Maildir 都不在
+    # 五部 RFC 内，D11）→ `hard` 集合**必须为空**。这是"语义层真的拿不到 hard"的显式证据：
+    # 若哪天有人把 A/C 提成 hard，这里会红（原句门禁也会先红）。
+    hard_a = sorted(rule_id for rule_id, rule in CATALOG.items() if rule.rule_id.startswith("MC-A") and rule.klass == "hard")
+    assert hard_a == []
+    hard_c = sorted(rule_id for rule_id, rule in CATALOG.items() if rule.rule_id.startswith("MC-C") and rule.klass == "hard")
+    assert hard_c == []

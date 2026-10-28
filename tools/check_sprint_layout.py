@@ -11,7 +11,7 @@
 * 永不崩：被检查对象不存在时报一条 FAIL 并继续；
 * 真值不取自任何一个副本（逐副本采集，任一里程碑出现两种状态即 FAIL）。
 
-**变异验证**（改完判据必重跑，见 tools/verify_layout_gate.py）：18 组，全组符合预期。
+**变异验证**（改完判据必重跑，见 tools/verify_layout_gate.py）：16 组，全组符合预期。
 """
 
 from __future__ import annotations

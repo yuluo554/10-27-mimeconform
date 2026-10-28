@@ -4,7 +4,7 @@
 - 来源：HN 32979369 / HN 6855700（mbox 转义问题；逐字原话见 data/README.md §1.4，本 case 只引编号、不改写引文）
 - 输入：`mail.mbox`（486 bytes；sha256 `a761ad35bff399a14c4b7d49345905b76c05eae8398b3c8f1f1c2958565ac439`）
 - 期望指纹：`942597257ea7c7c52d4f4221ae7e0d02d4bdcb5475e92b85e217663921b6f235`
-- 树指纹：`None`（容器输入，自 M5 起回填）
+- 树指纹：`None`（容器输入：§7.8 的 tree_digest 主语是一棵树，容器不适用）
 - 比对键：`rule_id` / `path` / `offset` / `class`（**不比 `severity`** —— 受原句门禁影响会随里程碑提升）
 - 重生成核对：`py -3.12 -m mimeconform.devtools.gen_golden --check`
 - 引擎回归（M2 起）：`py -3.12 -m mimeconform audit data/golden/c-from-unescaped/mail.mbox`

@@ -4,8 +4,10 @@
 > 由 `tests/test_catalog_doc.py` 机器断言（不是人工核对）。
 > **编号语义**只在 `data/README.md` §7.2 定义；**数值口径**（三值 / 四档 / 退出码 / 指纹 / 判定顺序）只在 §七；
 > 本文只写"这条规则判什么、依据到哪一行、正负例在哪、常见误报是什么"。
-> **覆盖范围**：本文件随里程碑增量维护。当前覆盖 **B 簇 10 条（M2）+ H 簇 12 条（M3）+ T 传输编码 11 条（M4）= 33 条**；
-> A / C 两簇在 M5 追加，`catalog.json` 与本文同步增长（同一笔提交）。
+> **覆盖范围**：本文件随里程碑增量维护。当前覆盖 **B 簇 10 条（M2）+ H 簇 12 条（M3）+ T 传输编码 11 条（M4）+
+> A 簇 8 条（M5）+ C 容器 5 条（M5）= 46 条**；`catalog.json` 与本文同一笔提交同轮增长。
+> **A / C 两簇全部 `diff`/`note`**（`plan/00` D11）：`Content-Disposition`、`multipart/related` 与
+> mbox / Maildir 都不在本题核对的五部 RFC 之内 → `rfc = none-by-design`。
 
 ---
 
@@ -157,16 +159,73 @@ R8（RFC 2045 §6.7）**全录**了两句原句：`encoded lines be no more than
 
 ---
 
-## 五、尚未覆盖的簇（如实标注，不占位成"已完成"）
+## 五、簇覆盖总览（如实标注，不占位成"已完成"）
 
 | 簇 | 模块 | 规则数 | 状态 |
 | --- | --- | --- | --- |
-| A 归属与引用 | `attribution.py` | 8（`plan/03` §四） | ⬜ 里程碑 M5 |
-| C 容器 | `container.py` | 5（`plan/03` §五） | ⬜ 里程碑 M5 |
+| B boundary / multipart 树 | `scan.py` | 10 | ✅ 里程碑 M2 |
+| H 头编码（2047 / 2231） | `headers.py` | 12 | ✅ 里程碑 M3 |
+| T 传输编码 | `transfer.py` | 11 | ✅ 里程碑 M4 |
+| A 归属与引用 | `attribution.py` | 8 | ✅ 里程碑 M5 |
+| C 容器 | `container.py` | 5 | ✅ 里程碑 M5 |
+| 扩展项（`--explain` / `--fix-plan` / SARIF） | — | — | ⬜ 不进首期判定路径（`plan/01` §二） |
 
 ---
 
-## 六、机器断言清单（本文与 catalog 的一致性由谁保证）
+## 六、A 簇 · 归属与引用（`attribution.py`，里程碑 M5）
+
+> **全部 `diff/note`（D11）**：`Content-Disposition` 与 `multipart/related` 的正式定义不在五部 RFC 内
+> ⇒ `rfc = none-by-design`，台账无原句可引。`filename` 取值顺序**先 RFC 2231（含续行）再 RFC 2047**
+> （`plan/00` D10，`headers.decode_filename`，`attribution` 是它的调用点）。
+
+| rule_id | 判定 | class | severity | 台账行 / 子项 | 正例 | 负例 | 常见误报与规避 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| MC-A01 | 文本附件被当正文（text/* 带 name/filename 却缺 disposition，且同父有 text/plain 正文候选） | diff | note | `none-by-design` | `a-body-attach` | `a-clean-mixed` | 只对带 `name`/`filename` 的 text/* 触发；`text/html` 与 `text/plain` 并列不报（`b-wrapped-header`）；`multipart/alternative` 整簇跳过 |
+| MC-A02 | `name` 与 `filename` 不一致 | diff | note | `none-by-design` | `a-name-mismatch` | `a-clean-mixed` | 两个字段都出现且**解码后**不同才报；只有一个时无事 |
+| MC-A03 | 声明了 disposition 却无任何 filename / name（下游 Noname） | diff | note | `none-by-design` | `a-noname` | `a-clean-mixed` | 只有 attachment/inline 才算"声明了 disposition"；无 disposition 的归 A01/A08 |
+| MC-A04 | 正文 `cid:` 引用无对应 Content-ID | diff | note | `none-by-design` | `a-cid-open` | `a-clean-mixed` | 比较按**尖括号内字面值、不 URL 解码**；同一字面值只记首次出现 |
+| MC-A05 | `multipart/related` 的 `start` / `type` 与实际首部件不一致 | diff | note | `none-by-design` | `a-related-start` | `a-clean-mixed` | `start` 缺省时取首部件；只在显式给出且不指向首部件时记；每节点最多一条 |
+| MC-A06 | `message/rfc822` 转发体没有 disposition | diff | note | `none-by-design` | `a-rfc822` | `a-clean-mixed` | 只看转发体节点自身；内层消息的头块另算 |
+| MC-A07 | `inline` 却无 Content-ID | diff | note | `none-by-design` | `a-inline-nocid` | `a-clean-mixed` | 只有 inline 触发（attachment 不要求 Content-ID） |
+| MC-A08 | 多个叶节点都无可判定 disposition，且无 text/plain 正文候选 | diff | note | `none-by-design` | `a-no-disposition` | `a-clean-mixed` | 有正文候选时归属**可判定**，不报；登记在 multipart 节点上 |
+
+### 6.1 保守判定的三条纪律
+
+1. **A01 需要"像附件"的证据**：叶节点自身带 `name`/`filename` 参数。没有名字的 `text/html`
+   与 `text/plain` 并列是**合法的正文并置**（`b-wrapped-header` 就是这一形态，误报它会打挂负例）。
+2. **A08 需要"整棵树没法判"**：至少两个叶节点、全部缺可判定 disposition、且没有 `text/plain`
+   正文候选。有候选时归属是可判定的（`a-body-attach` 因此只出 A01，不出 A08）。
+3. **`cid:` 只做字面比较**：不做 URL 解码、不做大小写折叠。
+
+---
+
+## 七、C 簇 · 容器（mbox / Maildir，`container.py`，里程碑 M5）
+
+> **全部 `diff/note`（D3）**：`>From` 转义是 **mboxo 约定，不是 RFC**；mboxrd / mboxcl 的规则互不相同。
+> 报告**必须同时输出三种读法的切分表**（`split_variants`），`auto` 只决定主表是哪一份。
+> 偏移口径：容器层用 `message-relative`（从该消息 `From ` 行首起），文件级偏移见切分表 `file_offset`。
+
+| rule_id | 判定 | class | severity | 台账行 / 子项 | 正例 | 负例 | 常见误报与规避 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| MC-C01 | `From ` 分隔行无法解析（缺日期字段） | diff | note | `none-by-design` | `c-from-bad` | `c-clean-mbox` | 判据 = 地址之后必须有带数字的日期字段；该行仍被当作消息边界，不再叠报其它容器规则 |
+| MC-C02 | 正文里 `From ` 行未转义 → 各变体切分表不一致 | diff | note | `none-by-design` | `c-from-unescaped` | `c-clean-mbox` | 只在"其它变体在此切分、主表不切"时触发；正确转义（`>From `）不报 |
+| MC-C03 | 零长度消息（两条分隔行之间 0 字节） | diff | note | `none-by-design` | `c-empty-msg` | `c-clean-mbox` | 空消息仍占一个 `msg#N` 序号（序号不回收） |
+| MC-C04 | 正文含裸 `From ` 行被误当分隔行（片段不具备头块） | diff | note | `none-by-design` | `c-body-from` | `c-clean-mbox` | 与 C02 的分工：C02 = 变体**不一致**；C04 = 三种读法**一致**误切且片段不成消息 |
+| MC-C05 | Maildir `cur/` 条目名缺 `:2,<flags>` 信息段 | diff | note | `none-by-design` | `c-maildir-name` | `c-clean-mbox` | 只对 `cur/` 触发（`new/` / `tmp/` 无信息段要求）；规则作用于文件名 → `offset=0` 是占位 |
+
+### 7.1 `auto` 的判定（§7.7 纯字节规则，不打分）
+
+```
+文件内出现 `Content-Length:` 头 → 主表 mboxcl
+否则出现 `>From ` 且无 `>>From ` → 主表 mboxo
+否则 → 主表 mboxo
+```
+**三种读法的切分表全部写进报告**（`split_variants`）；缺陷只从主表产出。切换主表（`--mbox-variant`）
+会改变"哪条消息算一条"——这正是 C02 存在的意义：**变体差异是证据，不是某一种读法错了**。
+
+---
+
+## 八、机器断言清单（本文与 catalog 的一致性由谁保证）
 
 | 断言 | 位置 |
 | --- | --- |
@@ -175,6 +234,8 @@ R8（RFC 2045 §6.7）**全录**了两句原句：`encoded lines be no more than
 | `catalog.json` 的 `MC-B0x` 五字段 == `scan._RULE_META` | `tests/test_catalog_consistency.py::test_meta_matches_catalog_verbatim[scan]` |
 | `catalog.json` 的 `MC-H0x/1x` 五字段 == `headers._RULE_META` | `tests/test_catalog_consistency.py::test_meta_matches_catalog_verbatim[headers]` |
 | `catalog.json` 的 `MC-T*` 五字段 == `transfer._RULE_META` | `tests/test_catalog_consistency.py::test_meta_matches_catalog_verbatim[transfer]` |
+| `catalog.json` 的 `MC-A*` 五字段 == `attribution._RULE_META` | `tests/test_catalog_consistency.py::test_meta_matches_catalog_verbatim[attribution]` |
+| `catalog.json` 的 `MC-C*` 五字段 == `container._RULE_META` | `tests/test_catalog_consistency.py::test_meta_matches_catalog_verbatim[container]` |
 | `detector` 能在声明的 `module` 里解析到 | `tests/test_catalog_consistency.py::test_detector_resolves_in_its_module` |
 | 原句门禁（`hard` 必须有逐字原句） | `mimeconform/rules/__init__.py::load_catalog` + `tests/test_catalog_gate.py` |
 | 语义层规则永不 `hard` | `tests/test_catalog_gate.py::test_semantic_rule_cannot_be_hard` |

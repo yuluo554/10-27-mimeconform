@@ -331,6 +331,136 @@
       "ledger_key": "none-by-design",
       "detector": "transfer._qp_defects",
       "summary": "QP 二次编码残留（解码一遍后仍见字面 `=HH`；只登记，不猜责任方）"
+    },
+    {
+      "rule_id": "MC-A01",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "文本附件被当正文：text/* 叶节点带 name/filename 却缺可判定 disposition，且同父有 text/plain 正文候选（SO 6255202）"
+    },
+    {
+      "rule_id": "MC-A02",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "Content-Type 的 name 与 Content-Disposition 的 filename 不一致（下游按不同字段取名会得到两个名字）"
+    },
+    {
+      "rule_id": "MC-A03",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "声明了 disposition 却没有任何 filename / name 参数（下游显示 Noname；SO 12816042）"
+    },
+    {
+      "rule_id": "MC-A04",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "正文 cid: 引用没有对应的 Content-ID（按尖括号内字面值比较、不 URL 解码；SO 10107788）"
+    },
+    {
+      "rule_id": "MC-A05",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "multipart/related 的 start / type 与实际首部件不一致（SO 39328935）"
+    },
+    {
+      "rule_id": "MC-A06",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "message/rfc822 转发体没有 disposition：转发副本还是附件无法判定"
+    },
+    {
+      "rule_id": "MC-A07",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "disposition 是 inline 却没有 Content-ID：正文无法用 cid: 引用它（内嵌图不显示的成因之一）"
+    },
+    {
+      "rule_id": "MC-A08",
+      "module": "attribution",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "attribution.audit_attribution",
+      "summary": "多个叶节点都缺可判定 disposition，且没有 text/plain 正文候选：整棵树的归属无法判定（SO 24246391）"
+    },
+    {
+      "rule_id": "MC-C01",
+      "module": "container",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "container.split_container",
+      "summary": "`From ` 分隔行无法解析（缺日期字段；mbox 约定不是 RFC；cpython #93376）"
+    },
+    {
+      "rule_id": "MC-C02",
+      "module": "container",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "container.split_container",
+      "summary": "正文里的 `From ` 行未转义，各变体读法的切分表不一致（mboxo/mboxrd 误切、mboxcl 不受影响）"
+    },
+    {
+      "rule_id": "MC-C03",
+      "module": "container",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "container.split_container",
+      "summary": "零长度消息（两条分隔行之间没有任何字节；序号不回收）"
+    },
+    {
+      "rule_id": "MC-C04",
+      "module": "container",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "container.split_container",
+      "summary": "正文含裸 `From ` 行被误当分隔行：切出的片段不具备消息头块（三种读法一致误切）"
+    },
+    {
+      "rule_id": "MC-C05",
+      "module": "container",
+      "klass": "diff",
+      "severity": "note",
+      "rfc": "none-by-design",
+      "ledger_key": "none-by-design",
+      "detector": "container.audit_maildir",
+      "summary": "Maildir cur/ 条目名缺 `:2,<flags>` 信息段（Maildir 约定不是 RFC）"
     }
   ]
 }

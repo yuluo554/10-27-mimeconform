@@ -288,7 +288,7 @@ def _read_input(path: Path) -> bytes:
     if not path.exists():
         raise UsageError(f"输入不存在: {path}")
     if path.is_dir():
-        raise UsageError(f"输入是目录（容器层自里程碑 M5 起支持）: {path}")
+        raise UsageError(f"输入是目录，走容器（Maildir）路径: {path}")
     try:
         with path.open("rb") as handle:
             return handle.read()
@@ -300,17 +300,22 @@ def _engine_available() -> bool:
     """引擎是否已落地（`scan_message` 不再抛 `EngineNotReady` 即为真）。
 
     M2 起 `scan.py` 已实现，本函数恒为真；保留它是因为**报告路径只在这一处汇总**
-    —— 将来再加模块（M3–M5）时，接线点仍然只有 `_run_audit` 一个。
+    —— 将来再加模块时，接线点仍然是 `_run_audit` 一个。
     """
     return True
 
 
-#: 本轮 `audit` 真正跑过的引擎层（顺序 = 报告里的展示顺序）。
-#: **加模块必须同改这里**，否则报告会把"没查"说成"查过"（`tests/test_cli_contract.py` 断言）。
-_AUDITED_ENGINES: tuple[str, ...] = ("scan", "headers", "transfer")
+#: 已落地并接线的引擎层**清单**（五个模块全接入；顺序 = 报告里的展示顺序）。
+#: 这组常量是"清单"，不是"本次真跑过哪些"——后者见 `_MESSAGE_ENGINES` / `_CONTAINER_ENGINES`。
+_AUDITED_ENGINES: tuple[str, ...] = ("scan", "headers", "transfer", "attribution", "container")
 
-#: 仍未接入 `audit` 的引擎层（M5）。它们仍是 `EngineNotReady`。
-_NOT_YET_AUDITED: tuple[str, ...] = ("attribution", "container")
+#: 仍未接入 `audit` 的引擎层（M5 落地后为空：五个模块全部接入）。
+_NOT_YET_AUDITED: tuple[str, ...] = ()
+
+#: 单封消息路径上**真正**跑过的引擎（报告覆盖面必须逐次真实——"没查"不能说成"查过"）。
+_MESSAGE_ENGINES: tuple[str, ...] = ("scan", "headers", "transfer", "attribution")
+#: 容器路径上真正跑过的引擎（容器模式只审计容器层，逐消息的 MIME 引擎不在本轮路径内）。
+_CONTAINER_ENGINES: tuple[str, ...] = ("container",)
 
 
 def _audited_engines() -> tuple[str, ...]:
@@ -330,10 +335,12 @@ def _tree_info(result: object) -> dict[str, object]:
         "max_depth": facts.get("max_depth"),
         "tree_alternatives": len(tree_alternatives),
         "truncated_paths": list(facts.get("truncated_paths", ())),
-        # 覆盖面声明（M3）：报告必须自己说清"这轮审计了哪几层"——
-        # 否则一份干净的账本会被读成"全模块都查过了"。加模块时同改 `_audited_engines`。
-        "audited_engines": list(_audited_engines()),
+        # 覆盖面声明：报告必须自己说清"这轮审计了哪几层"——
+        # 否则一份干净的账本会被读成"全模块都查过了"。
+        "audited_engines": list(_MESSAGE_ENGINES),
         "not_yet_audited": list(_NOT_YET_AUDITED),
+        "not_applicable": ["container"],
+        "not_applicable_note": "单封消息输入不跑容器层（容器输入见 .mbox / Maildir 目录 / --container）",
     }
     if divergence is not None:
         info["divergence"] = {
@@ -346,19 +353,84 @@ def _tree_info(result: object) -> dict[str, object]:
     return info
 
 
-def _render(result: object, defects: tuple, *, input_name: str, data: bytes, exit_code: int) -> tuple[str, str]:
+def _attachments_info(attachments: object) -> list[dict[str, object]]:
+    """把 `AttributionResult.attachments` 变成可序列化的行（只搬运，不判定）。"""
+    rows: list[dict[str, object]] = []
+    for item in attachments:  # type: ignore[union-attr]
+        rows.append(
+            {
+                "path": getattr(item, "path", ""),
+                "disposition": getattr(item, "disposition", None),
+                "filename": getattr(item, "filename", None),
+                "name": getattr(item, "name", None),
+                "content_id": getattr(item, "content_id", None),
+                "referenced_by": list(getattr(item, "referenced_by", ())),
+            }
+        )
+    return rows
+
+
+def _container_tree_info(result: object) -> dict[str, object]:
+    """把 `ContainerResult` 的切分事实整理成报告字段（**所有变体的切分表都要输出**）。"""
+    split_variants: dict[str, object] = {}
+    variant_counts: dict[str, int] = {}
+    raw_variants = getattr(result, "split_variants", {}) or {}
+    for variant, spans in raw_variants.items():
+        variant_counts[str(variant)] = len(spans)
+        split_variants[str(variant)] = [
+            {
+                "index": span.index,
+                "start": span.start,
+                "end": span.end,
+                "file_offset": span.file_offset,
+                "from_line": span.from_line.decode("latin-1", "replace"),
+            }
+            for span in spans
+        ]
+    info: dict[str, object] = {
+        "mode": "container",
+        "container_kind": getattr(result, "container_kind", "mbox"),
+        "primary_variant": getattr(result, "primary_variant", C.MBOX_VARIANT_DEFAULT),
+        "variant_counts": variant_counts,
+        "split_variants": split_variants,
+        "entries": list(getattr(result, "entries", ())),
+        # §7.7：报告必须写明"按哪种读法"以及"变体互不兼容"。
+        "note": (
+            "`>From` 是 mboxo 约定，非 RFC；mboxo / mboxrd / mboxcl 的切分规则互不兼容。"
+            "三种读法的切分表全部给出，`auto` 只决定主表是哪一份。"
+        ),
+        "audited_engines": list(_CONTAINER_ENGINES),
+        "not_yet_audited": list(_NOT_YET_AUDITED),
+        "not_applicable": [name for name in _MESSAGE_ENGINES],
+        "not_applicable_note": (
+            "容器模式只审计容器层（MC-C）；逐消息的 MIME 结构 / 头编码 / 传输编码 / 归属"
+            "不在本轮容器路径内。"
+        ),
+    }
+    return info
+
+
+def _render(
+    root: object | None,
+    defects: tuple,
+    *,
+    tree_info: dict[str, object],
+    input_name: str,
+    input_bytes: int,
+    input_sha256: str,
+    exit_code: int,
+) -> tuple[str, str]:
     """同一份台账 → (JSON, Markdown)。两条产物同源（plan/02 §七）。"""
     from .ledger import build
     from .report import render_json, render_markdown
 
-    root = getattr(result, "root", None)
-    ledger = build(defects, root)
+    ledger = build(defects, root)  # type: ignore[arg-type]
     kwargs = dict(
         input_name=input_name,
-        input_bytes=len(data),
-        input_sha256=hashlib.sha256(data).hexdigest(),
+        input_bytes=input_bytes,
+        input_sha256=input_sha256,
         exit_code=exit_code,
-        tree_info=_tree_info(result),
+        tree_info=tree_info,
     )
     return render_json(ledger, **kwargs), render_markdown(ledger, **kwargs)
 
@@ -402,36 +474,109 @@ def _write_outputs(args: argparse.Namespace, json_text: str, md_text: str) -> No
 
 
 def _audit(data: bytes, args: argparse.Namespace):
-    """跑本轮已落地的全部引擎面，返回 ``(ScanResult-like, 合并后的缺陷元组)``。
+    """跑单封消息路径上已落地的全部引擎面。
+
+    返回 ``(ScanResult, 合并后的缺陷元组, AttributionResult)``。
 
     **接线点只有这一处**（`plan/03` §八）：每棒把新落地的模块加进这里，别处不改。
-    M2 = `scan`（树与边界）；M3 = `headers`（头编码）；M4 = `transfer`（传输编码）；M5 = `attribution`/`container`。
+    M2 = `scan`（树与边界）；M3 = `headers`（头编码）；M4 = `transfer`（传输编码）；
+    M5 = `attribution`（归属与引用）。
     """
+    from .attribution import audit_attribution
     from .headers import audit_headers
     from .scan import scan_message
     from .transfer import audit_transfer
 
     result = scan_message(data, max_depth=args.max_depth, strict_depth=args.strict_depth)
-    header_defects = audit_headers(result.root, data)
-    transfer_defects = audit_transfer(result.root, data)
+    attribution = audit_attribution(result.root, data)
     combined = tuple(
-        sorted(result.defects + header_defects + transfer_defects, key=lambda item: item.sort_key)
+        sorted(
+            result.defects
+            + audit_headers(result.root, data)
+            + audit_transfer(result.root, data)
+            + attribution.defects,
+            key=lambda item: item.sort_key,
+        )
     )
-    return result, combined
+    return result, combined, attribution
+
+
+def _is_container_path(path: Path, args: argparse.Namespace) -> bool:
+    """容器输入判定：显式 `--container` / 目录（Maildir）/ `.mbox` 扩展名。"""
+    if args.container:
+        return True
+    if path.is_dir():
+        return True
+    return path.suffix.lower() == ".mbox"
+
+
+def _maildir_digest(root: Path) -> tuple[int, str]:
+    """Maildir 目录的输入摘要：按条目相对路径排序，拼接 ``relpath \\0 content`` 求 sha256。"""
+    total = 0
+    digest = hashlib.sha256()
+    for sub in ("cur", "new", "tmp"):
+        directory = root / sub
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.iterdir(), key=lambda item: item.name):
+            if not path.is_file():
+                continue
+            blob = path.read_bytes()
+            total += len(blob)
+            digest.update(f"{sub}/{path.name}".encode("utf-8") + b"\x00" + blob)
+    return total, digest.hexdigest()
 
 
 def _run_audit(args: argparse.Namespace) -> int:
+    from .container import audit_maildir, split_container
+
     path = Path(args.path)
-    data = _read_input(path)
+    if not path.exists():
+        raise UsageError(f"输入不存在: {path}")
 
-    if not _engine_available():  # pragma: no cover - M2 起恒真
-        from ._pending import _not_ready
+    if _is_container_path(path, args):
+        if path.is_dir():
+            container = audit_maildir(path)
+            input_name = path.name
+            input_bytes, input_sha256 = _maildir_digest(path)
+        else:
+            data = _read_input(path)
+            container = split_container(data, variant=args.mbox_variant)
+            message_count = len(container.split_variants.get(container.primary_variant, ()))
+            if message_count == 0:
+                # 空分母 ≠ 通过：容器模式找不到任何消息 → 显式失败（§7.9 防腐层）。
+                raise UsageError(
+                    f"输入里没有找到任何 mbox 消息（{path}）：不是合法的容器输入"
+                    "（容器需以 `From ` 分隔行开头）"
+                )
+            input_name = path.name
+            input_bytes = len(data)
+            input_sha256 = hashlib.sha256(data).hexdigest()
+        root, defects, tree_info = None, container.defects, _container_tree_info(container)
+    else:
+        data = _read_input(path)
+        if not _engine_available():  # pragma: no cover - M2 起恒真
+            from ._pending import _not_ready
 
-        raise _not_ready("scan_message")
+            raise _not_ready("scan_message")
+        result, defects, attribution = _audit(data, args)
+        tree_info = _tree_info(result)
+        tree_info["attachments"] = _attachments_info(attribution.attachments)
+        root = result.root
+        input_name = path.name
+        input_bytes = len(data)
+        input_sha256 = hashlib.sha256(data).hexdigest()
 
-    result, defects = _audit(data, args)
     exit_code = decide_exit_code(defects, fail_on=args.fail_on)
-    json_text, md_text = _render(result, defects, input_name=path.name, data=data, exit_code=exit_code)
+    json_text, md_text = _render(
+        root,
+        defects,
+        tree_info=tree_info,
+        input_name=input_name,
+        input_bytes=input_bytes,
+        input_sha256=input_sha256,
+        exit_code=exit_code,
+    )
     _write_outputs(args, json_text, md_text)
     return exit_code
 
