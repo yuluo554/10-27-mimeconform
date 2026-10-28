@@ -168,7 +168,7 @@ TNEF / `winmail.dat` 专向、钓鱼 / URL / 内容安全分析、`.eml` 查看�
 | M3 | 头编码（MC-H）+ 缺陷分类表（人读 + 机读） | ✅ 完成 |
 | M4 | 传输编码（MC-T） | ✅ 完成 |
 | M5 | 归属与容器（MC-A / MC-C） | ✅ 完成 |
-| M6 | 发布 | 🟡 待首推执行（文档面与干净环境已定稿；tag/Release 尚未发生） |
+| M6 | 发布 | ✅ 完成 |
 
 > 本表与 `plan/00`、`plan/05` 逐字一致，由 `tools/check_sprint_layout.py` 断言。
 > **M6 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B + 头编码 MC-H +
