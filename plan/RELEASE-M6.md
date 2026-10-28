@@ -172,15 +172,17 @@ M6 真翻 ✅ 之后，这个前提消失 → 三组会变成"期望红实际绿
 | 首推 run（branch，交付面定稿笔） | `40632187803` — **success**；7 个 job 全绿：`py3.11/3.12/3.13` × `ubuntu/windows` 六格 + `offline (no network at runtime, no third-party imports)` |
 | 第二笔 run（branch，翻 ✅ 笔） | `40632496863` — **success**；同样 7 个 job 全绿 |
 | **tag push run** | `40633183415`（event=`push`, branch=`v1.0.0`）— **success**，47s |
-| push 数 = run 数对账 | branch 2 笔 → 2 个 run（`40632187803` / `40632496863`）；tag 1 笔 → 1 个 run（`40633183415`）。**3 笔 push / 3 个 run，相等** |
-| tag 后提交面 | 待本节回填提交落地后核对（`git diff --stat v1.0.0..HEAD` 只含 `plan/`） |
+| push 数 = run 数对账 | **截至 tag push：3 笔 push → 3 个 run**（`40632187803` 交付面定稿 / `40632496863` 翻 ✅ / `40633183415` tag push）= 相等，均 success。**自指声明**：此后每笔 `plan/` 回填提交都会再添一笔 push 与一个 run，"/ 最后一个 run 数"这类值**永远写不稳**，故本表只对账到 tag push 为止；回填笔的 run 不登记（写了也会因为"写它"这个动作而再次失效） |
+| tag 后提交面 | `git diff --stat v1.0.0..HEAD` = 4 个文件、全部以 `plan/` 开头（`00-README总览` / `05-里程碑与验收` / `06-交付对标与决策` / `RELEASE-M6`），**代码面与交付面零改动** ✓ |
 | Release | `https://github.com/yuluo554/10-27-mimeconform/releases/tag/v1.0.0`；附件 **2 个**：`mimeconform-1.0.0.tar.gz` + `SHA256SUMS` |
 
 ### 2.3 回填时的实测记录
 
 - **`POST_TAG` 声明**：tag `v1.0.0` 建立后，本仓库**没有**再改代码面——tag 之后只提交 `plan/` 下的
   文档回填（本节 + §一 的 `待首推` → 实测值）。核验方式 = `git diff --stat v1.0.0..HEAD`
-  的文件清单全部以 `plan/` 开头（下一笔提交后即为现状）。
+  的文件清单全部以 `plan/` 开头（2.2 表已记实测清单）。本笔回填自身的 run 为
+  `40633503969`（success），**仅作过程事实登记**：它不参与 2.2 的"push 数 = run 数"对账
+  （那条只对账到 tag push），因为每写一次都会再添一笔。
 - **覆盖对账的 7 条 `待首推` 归宿**（对应 §1.7 的 #1 / #6 / #23 / #24 / #25 / #26 / #27）：
   首推与 tag push 均全绿（run id 见 2.2），逐条已由真实 run 证；#6 的"解包树里逐条敲 README"
   与 #1 的"真下载 + 中立目录"在 2.1 的"解包树复跑 / 真下载复核 / 第三路证明"三行里完成。
