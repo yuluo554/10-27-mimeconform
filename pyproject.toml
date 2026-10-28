@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,14 +8,14 @@ version = "1.0.0"
 description = "MIME structural conformance ledger: defect + position + severity + RFC citation, from raw bytes."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "yuluo554" }]
 keywords = ["mime", "email", "rfc2045", "rfc2046", "rfc2047", "rfc2231", "mbox", "lint", "audit"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -42,5 +42,7 @@ mimeconform = ["rules/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+# `addopts = "-q"` 已于 2026-10-28 二次迭代删除（D2）：它与 README 的 `pytest -q`
+# 叠加成 `-qq`，pytest 在 -qq 下**不打印汇总行** → 看不见 passed 就只能抄
+# `--collect-only` 的 collected 数（D1 那个 682 的来源）。保留 testpaths 与 filterwarnings。
 filterwarnings = ["error::DeprecationWarning"]

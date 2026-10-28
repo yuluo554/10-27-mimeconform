@@ -34,6 +34,8 @@ SKIP_DIRS = frozenset(
         ".tmp",
         "tmp",
         "scratch",
+        # 会话交接物与迭代记录（.gitignore 已同条声明；里面天然带本机路径与诊断现场）
+        "update",
         "dist",
         "dist-release",
         "release",

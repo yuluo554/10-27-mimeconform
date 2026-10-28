@@ -22,9 +22,9 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -57,7 +57,7 @@ jobs:
       - name: "Desensitization gate (no host paths / usernames / loopback proxy)"
         run: python tools/check_desensitized.py
 
-      - name: "Layout gate mutation verification (18 groups; must all behave as expected)"
+      - name: "Layout gate mutation verification (16 groups; must all behave as expected)"
         run: python tools/verify_layout_gate.py
 
       - name: "Full test suite"
@@ -67,7 +67,7 @@ jobs:
     name: "offline (no network at runtime, no third-party imports)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # 运行期完全无网络；构建期允许拉基础镜像。
       # 镜像内**不 pip install** —— 直接 COPY 就说明"无安装步骤也能跑"。
