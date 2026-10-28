@@ -151,24 +151,41 @@ M6 真翻 ✅ 之后，这个前提消失 → 三组会变成"期望红实际绿
 
 | 项 | 值 |
 | --- | --- |
-| 产物名 | `mimeconform-1.0.0.tar.gz` |
+| 产物名 | `mimeconform-1.0.0.tar.gz`（310,267 bytes） |
 | 生成命令 | `git archive --format=tar --prefix=mimeconform-1.0.0/ v1.0.0 \| gzip -9n > mimeconform-1.0.0.tar.gz` |
-| sha256 | ⬜ 待回填（tag 后实测，同时写进 Release 正文） |
-| 复算证明 | ⬜ 待回填（同命令再跑一次 → `cmp` 逐字节一致） |
-| 解包树复跑 | ⬜ 待回填（`git archive` 解包树内：布局门 + 脱敏门 + 变异自证 + `selftest`） |
+| **sha256（源码包）** | `e43737e501ec5d880ac15bf30483062eedaa3f054347e8624d88ff78fceb0da0` |
+| **sha256（SHA256SUMS）** | `32326fbcaf383bd787e92ffe750387dc14767e5bfcfcde34e1fe13ce05a8cc07` |
+| 复算证明（两次 archive） | 同命令连跑两次 → `cmp` **逐字节一致** ✓ |
+| 真下载复核 | `gh release download v1.0.0` 取回的附件与本地副本 `cmp` **逐字节一致** ✓ |
+| 第三路证明 | 从 tag **重新** `git archive \| gzip -9n` → 与下载件 `cmp` **逐字节一致** ✓（不依赖任何写死的值） |
+| 解包树复跑 | 解包（224 个文件、**无 `.git`**）后：布局门 9/9 PASS（handoffs 6、RELEASE 两栏 True / 三态行 35）、脱敏门 173 文件 0 命中、变异自证 **16 组 16 符合预期**、`selftest` `51 cases, 0 问题`、`gen_golden --check` `51 cases, 0 diff`、`pytest` **682 passed / 2 skipped**（多出的 1 个 skip = `test_golden_files_are_committed_only_under_golden` 对无 `.git` 树显式跳过，是设计意图） |
 
 ### 2.2 tag 与 run
 
 | 项 | 值 |
 | --- | --- |
-| tag | `v1.0.0`（annotated；`git rev-parse v1.0.0` 与 `^{commit}` 各见 `git` 查询，**不在此写字面值**——本节在 tag 树里） |
+| tag | `v1.0.0`（**annotated**） |
+| 远端 tag 对象 | 远端 `refs/tags/v1.0.0` = `6cc3cb4e81245d5bf649ba6b4dbad4ce0222dfff` |
+| tag 指向的 commit | `716046c794e8bf64d90945ca74af58dd5c297f35`（= 翻 ✅ 那笔；`git cat-file -e v1.0.0:plan/RELEASE-M6.md` 通过） |
 | 分支 | `main` |
-| 仓库 | `https://github.com/yuluo554/10-27-mimeconform`（公开） |
-| 首推 run（branch） | ⬜ 待回填（run id + 6 矩阵 + 1 offline 结论） |
-| tag push run | ⬜ 待回填 |
-| tag 后提交面 | ⬜ 待回填（`git diff --stat v1.0.0..HEAD` 只含 `plan/`） |
-| Release | ⬜ 待回填（附件 ≥1、sha256 与 2.1 一致） |
+| 仓库 | `https://github.com/yuluo554/10-27-mimeconform`（**公开**，`private=false`，默认分支 `main`） |
+| 首推 run（branch，交付面定稿笔） | `40632187803` — **success**；7 个 job 全绿：`py3.11/3.12/3.13` × `ubuntu/windows` 六格 + `offline (no network at runtime, no third-party imports)` |
+| 第二笔 run（branch，翻 ✅ 笔） | `40632496863` — **success**；同样 7 个 job 全绿 |
+| **tag push run** | `40633183415`（event=`push`, branch=`v1.0.0`）— **success**，47s |
+| push 数 = run 数对账 | branch 2 笔 → 2 个 run（`40632187803` / `40632496863`）；tag 1 笔 → 1 个 run（`40633183415`）。**3 笔 push / 3 个 run，相等** |
+| tag 后提交面 | 待本节回填提交落地后核对（`git diff --stat v1.0.0..HEAD` 只含 `plan/`） |
+| Release | `https://github.com/yuluo554/10-27-mimeconform/releases/tag/v1.0.0`；附件 **2 个**：`mimeconform-1.0.0.tar.gz` + `SHA256SUMS` |
 
 ### 2.3 回填时的实测记录
 
-⬜ 待回填。
+- **`POST_TAG` 声明**：tag `v1.0.0` 建立后，本仓库**没有**再改代码面——tag 之后只提交 `plan/` 下的
+  文档回填（本节 + §一 的 `待首推` → 实测值）。核验方式 = `git diff --stat v1.0.0..HEAD`
+  的文件清单全部以 `plan/` 开头（下一笔提交后即为现状）。
+- **覆盖对账的 7 条 `待首推` 归宿**（对应 §1.7 的 #1 / #6 / #23 / #24 / #25 / #26 / #27）：
+  首推与 tag push 均全绿（run id 见 2.2），逐条已由真实 run 证；#6 的"解包树里逐条敲 README"
+  与 #1 的"真下载 + 中立目录"在 2.1 的"解包树复跑 / 真下载复核 / 第三路证明"三行里完成。
+  因此 §1.7 的**待首推 7 条全部关闭**，无一遗留。
+- **tag 树内那两栏是骨架**这一点已兑现：§一 全文零 sha256、零 tag OID（本轮回填把它们只写进本节）。
+- **诚实口径**：本轮没有在 `py3.11` / `py3.13` 的**本机**跑过任何东西（本机只有 3.12.10）；
+  跨版本结论的唯一来源是 CI 矩阵（run id 见 2.2）。本机离线闭环（无 docker）仍未做——
+  `offline` job 的证据来自 CI，本机仅有"零网络 import 的 AST 守门"作等价证明。

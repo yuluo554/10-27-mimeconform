@@ -33,7 +33,7 @@
 | `data/rfc-ledger.json` | RFC 条款台账的机读镜像（原句门禁的判据源） | ✅ 已落（M0 产出，M1 逐行对账） |
 | `data/golden/<case>/` | golden 语料 51 个 case（b/h/t/a/c 五簇，各含负例），每 case 三件 `输入 + expect.json + README.md` | ✅ 完成（M1） |
 | `plan/HANDOFF-M<k>.md` | 每棒交接单（七节） | ✅ M0 已豁免（见 §五） |
-| `plan/RELEASE-M6.md` | 发布留档（tag 前落盘，发布后事实分栏追加） | 🟡 §一 已落盘；§二 待首推后回填 |
+| `plan/RELEASE-M6.md` | 发布留档（tag 前落盘，发布后事实分栏追加） | ✅ 完成（2026-10-28：§一 tag 前事实 + §二 tag 后回填，含 sha256 / run id / 覆盖对账 34 条） |
 
 ---
 
