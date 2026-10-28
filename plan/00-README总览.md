@@ -9,7 +9,7 @@
 > **命名约定**：本地目录与 GitHub 仓库名均为 `10-27-mimeconform`；命令名 `mimeconform`；署名 `yuluo554`。
 > **定位宣言**："解码器已成红海（MimeKit 2010★、mailparser 1673★、flanker 1646★、mail-parser 472★、postal-mime 559★，2026-10-27 快照），但**没有任何工具输出「带 RFC 条款引用的结构缺陷账本」**；Python 标准库把 defect 记在对象上却不报告、且仍漏掉内层 boundary 重复。本工具输出：每缺陷 = 位置 + 严重度 + RFC 出处 + 硬规则/实现差异标记。"
 > **严格切割声明**：本系列另有一题做**邮件发件人身份认证**（认证语义层）。本题**只做 MIME 结构层**（multipart 树、头编码、附件编码、边界与容器），**全篇不涉及、不引用、不比较该题**。详见 `plan/01` 头部。
-> **版本**：v1（2026-10-27，出题阶段 4 = 骨架 + 首提交）
+> **版本**：v1（2026-10-27，出题阶段 4 = 骨架 + 首提交）；**定版 1.0.0（2026-10-28，M6）**
 
 ---
 
@@ -28,12 +28,12 @@
 | `plan/06-交付对标与决策.md` | 提交材料落点 / 评分维度证据 / 风险登记 / 缺口 | ✅ v1（2026-10-27，M0） |
 | `AGENTS.md` | 仓库锚点：方法论装订 / 强制布局 / 门命令 / 环境事实 | ✅ v1（2026-10-27，M0） |
 | `tools/check_sprint_layout.py` + `tools/check_desensitized.py` | 布局门 + 脱敏门（纯标准库，进 CI layout job） | ✅ v1（2026-10-27，M0） |
-| `README.md` | 安装 / 三场景 / 字段说明 / 已知边界 / 状态表 | 🟡 骨架版（M0）；场景随模块落地补齐 |
+| `README.md` | 安装 / 三场景 / 字段说明 / 已知边界 / 状态表 | ✅ 定稿（M6：安装节写明交付形态 = Release 手工源码包；三场景与容器两条逐条实跑） |
 | `docs/defect-catalog.md` + `mimeconform/rules/catalog.json` | 缺陷分类表（人读 + 机读） | ✅ 完成（M5：46 条 = B 10 + H 12 + T 11 + A 8 + C 5；两处规则数与 class/severity 机器对账） |
 | `data/rfc-ledger.json` | RFC 条款台账的机读镜像（原句门禁的判据源） | ✅ 已落（M0 产出，M1 逐行对账） |
 | `data/golden/<case>/` | golden 语料 51 个 case（b/h/t/a/c 五簇，各含负例），每 case 三件 `输入 + expect.json + README.md` | ✅ 完成（M1） |
 | `plan/HANDOFF-M<k>.md` | 每棒交接单（七节） | ✅ M0 已豁免（见 §五） |
-| `plan/RELEASE-M6.md` | 发布留档（tag 前落盘，发布后事实分栏追加） | ⬜ 待 M6 |
+| `plan/RELEASE-M6.md` | 发布留档（tag 前落盘，发布后事实分栏追加） | 🟡 §一 已落盘；§二 待首推后回填 |
 
 ---
 
@@ -104,7 +104,7 @@
 | 退出码 0/1/2/3 | 自定契约（`data/README.md` §7.9） | ✅ | 退出码矩阵 4 行：CLI 级 0/1/2/3 已可跑（M2 接线，`tests/test_cli_contract.py`）；函数级 0/2/3 已锁（`tests/test_exit_codes.py`） | ✅ 完成（M2：CLI 级 2 = 只有 minor、3 = 有 major/blocker，均由真命令断言） |
 | 真实邮件不入仓 | `.gitignore` + 生成器复核 | ✅ | `git ls-files '*.eml'` 只出现在 `data/golden/**` 且均为合成样本 | ✅ 规则已落 |
 | 开源空白论据 | `gh api` 检索快照 2026-10-27T10:56Z–11:04Z | — | 检索式与 total_count 记录在 `plan/01` §1.5、`data/README.md` §一.2 | ✅ 已记录（⬜ 软论据口径） |
-| 单二进制/单包零运行时依赖（发布态） | `pipx`/`python -m` 直接可用，无第三方依赖 | ✅ | 干净环境（仅 CPython）安装运行 | ⬜ 待 M6 |
+| 单二进制/单包零运行时依赖（发布态） | `pipx`/`python -m` 直接可用，无第三方依赖 | ✅ | 干净环境（仅 CPython）安装运行 | ✅ 完成（2026-10-28）：仓库外新 venv 内 `pip install --no-build-isolation ".[dev]"` → `mimeconform --version` = `1.0.0`，零第三方运行时依赖由 `dependencies = []` 断言 |
 | 方法论装订（锚点 + 两道门） | `AGENTS.md` + `tools/check_sprint_layout.py` + `tools/check_desensitized.py` + 本文件顶部装订行 | ✅ | 两条门本机跑绿；布局门 ≥8 组变异全红 | ✅ 完成（M0） |
 | 计划套件齐全（00–06 + data 台账） | `plan/00`–`06` + `data/README.md` | ✅ | 布局门 `LAYOUT.FILES` / `LAYOUT.SECTIONS` | ✅ 完成（M0） |
 | 可运行骨架（`--version` / 退出码 0·1） | `pyproject.toml` + `mimeconform/cli.py` + `tests/` | ✅ | `mimeconform --version` = 0；用法错误 = 1；`pytest` 全绿 | ✅ 完成（M0） |
@@ -142,7 +142,7 @@
 | **M3 头编码** | RFC 2047 / 2231 检查 + MC-H 系列；复现 SO 44154520（缺 `*0`）与 SO 52442469（encoded-word 内换行）；缺陷分类表落盘 | ✅ 完成（2026-10-28） |
 | **M4 传输编码（CTE）** | base64 / QP 自写编解码 + MC-T 系列；复现 SO 79133579（QP 伪影）与 SO 6029218（base64 损坏）；缺陷分类表扩到 33 条 | ✅ 完成（2026-10-28） |
 | **M5 归属与容器** | 归属与引用审计（MC-A 系列）+ 容器层（MC-C 系列）；复现 SO 6255202 / 12816042 / #93376；缺陷分类表扩到 46 条；mbox 三变体并出；CLI 接线五模块全接入 | ✅ 完成（2026-10-28） |
-| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |
+| **M6 发布** | 干净环境验证 + 发布 | 🟡 待首推执行（文档面与干净环境已定稿；tag/Release 尚未发生） |
 
 > **M0 的收尾记录就是计划套件本身**（本项目已声明豁免）：M0 不写 `plan/HANDOFF-M0.md`，其 DoD 与证据即 `plan/00`–`06` 与 `AGENTS.md`。**M1 起每棒必须有交接单**（含收尾棒），由布局门断言。
 

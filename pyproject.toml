@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mimeconform"
-version = "0.0.0.dev0"
+version = "1.0.0"
 description = "MIME structural conformance ledger: defect + position + severity + RFC citation, from raw bytes."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -12,7 +12,7 @@ license = { text = "MIT" }
 authors = [{ name = "yuluo554" }]
 keywords = ["mime", "email", "rfc2045", "rfc2046", "rfc2047", "rfc2231", "mbox", "lint", "audit"]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",

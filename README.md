@@ -37,14 +37,19 @@ Python 标准库的 `email` 包**知道**有缺陷，但只把缺陷挂在对象
 ## 安装
 
 ```bash
-# 只装本体（零第三方运行时依赖）
+# 从仓库根目录安装本体（零第三方运行时依赖）
 pip install .
 
 # 开发态（含 pytest）
 pip install -e ".[dev]"
 ```
 
-要求 Python **3.11+**。
+要求 Python **3.11+**。当前版本 **1.0.0**（`mimeconform --version` 打印同一串）。
+
+> 本项目**不发 PyPI**：交付形态是 GitHub Release 上的**手工源码包**
+> `mimeconform-1.0.0.tar.gz` + `SHA256SUMS`（先解包，再在里面 `pip install .`）。
+> 源码包由 `git archive --format=tar --prefix=mimeconform-1.0.0/ <tag> | gzip -9n` 生成，
+> 同一 tag 重跑逐字节一致，因此 sha256 可复验。
 
 ---
 
@@ -163,12 +168,13 @@ TNEF / `winmail.dat` 专向、钓鱼 / URL / 内容安全分析、`.eml` 查看�
 | M3 | 头编码（MC-H）+ 缺陷分类表（人读 + 机读） | ✅ 完成 |
 | M4 | 传输编码（MC-T） | ✅ 完成 |
 | M5 | 归属与容器（MC-A / MC-C） | ✅ 完成 |
-| M6 | 发布 | ⬜ 未开始 |
+| M6 | 发布 | 🟡 待首推执行（文档面与干净环境已定稿；tag/Release 尚未发生） |
 
 > 本表与 `plan/00`、`plan/05` 逐字一致，由 `tools/check_sprint_layout.py` 断言。
-> 当前 **M5 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B + 头编码 MC-H +
+> **M6 已完成**：`audit` 可对单封 `.eml` 真跑（multipart 树 + MC-B + 头编码 MC-H +
 > 传输编码 MC-T + 归属与引用 MC-A），也可对 `.mbox` / Maildir 真跑容器层（MC-C，三变体切分表并出）；
 > 五个引擎层全部接入，`not_yet_audited` 恒为空。缺陷分类表 46 条（B10 + H12 + T11 + A8 + C5）。
+> 发布与验收的逐条证据见 `plan/RELEASE-M6.md`。
 
 ---
 

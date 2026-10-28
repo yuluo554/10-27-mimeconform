@@ -2,6 +2,8 @@
 
 > 产出棒：M5（归属与容器：`attribution.py` 8 条 MC-A + `container.py` 5 条 MC-C + `rules/catalog.json` /
 > `docs/defect-catalog.md` 扩到 46 条 + 容器输入接线），2026-10-28。
+> **本文件同时是 M6 的收官记录**：§一–§七 是"进入 M6"的交接（历史事实，保持原样），
+> **§八 是 M6 完成后的收官记录**（收尾棒也必须有交接单，见 `plan/05` §五）。
 > 用法：新对话第一件事 = 跑 `py -3.12 tools/check_sprint_layout.py`（见 `AGENTS.md`）。
 > **库内一律相对路径**；绝对路径只出现在会话启动命令里。
 
@@ -204,3 +206,72 @@ py -3.12 -m venv <dir> && <dir>/Scripts/python.exe -m pip install "setuptools>=6
 git archive --format=tar --prefix=mimeconform-<ver>/ <tag> | gzip -9n > mimeconform-<ver>.tar.gz
 sha256sum mimeconform-<ver>.tar.gz
 ```
+
+---
+
+## 八、M6 收官记录（2026-10-28）
+
+> 本节是 M6 **完成后**写的。§一–§七 是"进入 M6"的交接内容，**未修改**（历史事实）。
+> 发布事实的逐条证据在 `plan/RELEASE-M6.md`（两栏 + 覆盖对账 34 条）。
+
+### 8.1 M6 做了什么（按 `plan/05` §二 M6 DoD 顺序）
+
+| # | 事项 | 结论 |
+| --- | --- | --- |
+| 1 | 交付面定稿 | 版本 `0.0.0.dev0` → **`1.0.0`**；`pyproject.toml` + `mimeconform/__init__.py` + `README.md` 三处同串，发布包名第四处；classifier 从 `2 - Pre-Alpha` 改 `5 - Production/Stable`；README 安装节补"不发 PyPI、交付形态是 Release 上的手工源码包" |
+| 2 | 干净环境验证 | 仓库外新 venv（仅 CPython + setuptools）→ `pip install --no-build-isolation ".[dev]"` → `mimeconform --version` = `mimeconform 1.0.0` rc 0（**裸命令首次真实可用**）；`python -m mimeconform --version` 同；`selftest --data-dir data/golden` = `51 cases, 0 问题`；`pytest` = `682 passed, 1 skipped`。README 全部命令在**仓库外 cwd** 逐条敲过（`plan/RELEASE-M6.md` §1.3 有 rc 对照表） |
+| 3 | 脱敏四步 | 见 §8.2 |
+| 4 | 建仓（公开）+ CI 首推 | 见 §8.3 |
+| 5 | 手工源码包 | 见 §8.4 |
+| 6 | tag + Release + 留档 | 见 §8.5 |
+
+### 8.2 脱敏四步（实测）
+
+1. `tools/check_desensitized.py` → **172 个文本文件，0 命中**（豁免 2 份）。
+2. `git ls-files '*.eml' '*.mbox' '*.mbx' '*.msg'` → **50 个，全部在 `data/golden/**`**。
+3. 内容级复核（密钥赋值 / `.env` 与私钥文件名 / 非 `example.invalid` 邮箱 / 手机号 / 身份证 /
+   真实盘符路径 / 内网 IP / 回环端口）→ 仅 2 处命中，均为 `tests/test_fixture_hygiene.py` 的
+   **故意阳性对照**（`alice@mail.google.com`，该测试的存在理由是证明真实域名必须被检出），非泄漏。
+4. 提交身份全历史去重 → 唯一 `yuluo554 <282769740+yuluo554@users.noreply.github.com>`。
+5. `git rev-list --all` 全树强标记 grep → 仅 golden 的 sha256 十六进制串 + 上述测试样本。
+6. 源码包解包后再扫 → 见 `plan/RELEASE-M6.md` §二。
+
+**姊妹项目表述**：全仓 grep 只命中本仓自己的目录名与 Homepage（有意公开的项目坐标），
+**无**对其他项目的提名 → 品牌隔离成立，无需掩码。
+
+### 8.3 建仓 + CI 首推
+
+- 名字占用在建仓**之前**核过：PyPI `mimeconform` = 404（未占用）；`gh api` 检索
+  `mimeconform in:name` / `10-27-mimeconform in:name` 的 `total_count` 均 = **0**（成功响应，非限流假 0）。
+- 公开仓库 + push + 等 run 绿 → run id 与矩阵结论记在 `plan/RELEASE-M6.md` §二。
+
+### 8.4 手工源码包
+
+`git archive --format=tar --prefix=mimeconform-1.0.0/ v1.0.0 | gzip -9n` → 同命令再跑一次 `cmp`
+逐字节一致（D15 的可复算口径）；`SHA256SUMS` 与 Release 正文同源；本地留副本在仓库外。
+**哈希字面值只写在 `plan/RELEASE-M6.md` §二 与 Release 正文**（§一 与包内文档不写——写进去就失效）。
+
+### 8.5 tag + Release
+
+- tag `v1.0.0`（annotated）打在"交付面定稿 + 留档 §一 落盘"这笔提交上；tag 之后只允许**只动 `plan/`** 的提交。
+- Release 附 `mimeconform-1.0.0.tar.gz`（≥1 附件），正文含：变更摘要 / 规则集与台账版本（46 条规则、
+  11 行台账的 `data/rfc-ledger.json`）/ 是否需要重跑历史报告（首个版本无历史报告 → 口径写"无需重跑"）/
+  sha256 / 已知问题。
+
+### 8.6 本轮修掉的两类真缺陷（不是"顺手改"）
+
+1. **瞬态变异靶子**：`tools/verify_layout_gate.py` 的 M11/M13/M14 原本靠"把 `plan/00` 的 M6 行临时翻 ✅"
+   来激活 `LAYOUT.RELEASE` / `LAYOUT.HANDOFFS`。M6 真翻 ✅ 后该前提消失，三组会变成"期望红实际绿"。
+   处置 = 加 `ensure_m6_done` seam（待办态时临时翻 ✅、逐字节还原；已是 ✅ 时不动），
+   并把 M11 的靶子从"翻状态行"改成"删发布留档"。**判据面一条不减**，从此与项目进度解耦。
+2. **README 安装面叙事与交付形态不一致**：原安装节写 `pip install .` 而不提"不发 PyPI"，
+   读者会去找 PyPI 包名。已补"交付形态 = Release 上的手工源码包"一段 + 附件名 + 复算方法。
+
+### 8.7 已知未验证项（M6 结束后仍如实保留）
+
+| 项 | 原因 | 处理 |
+| --- | --- | --- |
+| 跨解释器（3.11 / 3.13） | 本机只有 3.12.10 可用（3.8.8 低于下限 3.11） | 只由 CI 矩阵证；本机一律写"本地等价校验" |
+| 真实邮件语料 | 隐私红线 | 只用合成语料；不声称"大规模真实语料验证" |
+| 客户端实测（Outlook / Gmail / iOS） | 未实测 | 只做字节层判定，不承诺客户端显示行为 |
+| 本机离线闭环 | 本机无 docker | `offline` job 的"嵌套 `docker run --network none`"只在 CI 跑；本机以"零网络 import 的 AST 守门"作等价证明 |

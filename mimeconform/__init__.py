@@ -9,6 +9,6 @@
 * `rfc` 字段不得为空，无条款时写 ``none-by-design``。
 """
 
-__version__ = "0.0.0.dev0"
+__version__ = "1.0.0"
 
 __all__ = ["__version__"]

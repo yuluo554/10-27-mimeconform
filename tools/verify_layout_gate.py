@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -74,6 +75,11 @@ class Mutation:
     #: 附加编辑：``(target, marker, replacement)``，在主编辑之后施加、还原时一并复原。
     #: 用于"同时改门自己的配置"这类变异（如把 HANDOFF_EXEMPT_LAST 置 true）。
     extras: tuple[tuple[str, str, str], ...] = ()
+    #: **瞬态靶子的解药**：这几组判据（RELEASE / HANDOFFS）只在"发布里程碑已 ✅"时激活，
+    #: 而"M6 未开始"这件事本身会随进度消失（翻 ✅ 后本组就再也构造不出红态）。
+    #: 置 True 时，若 `plan/00` 的 M6 行仍是待办态，先把它临时翻成 ✅ 再施加主编；
+    #: 还原时一并复原。判据面因此与项目进度解耦（skill「瞬态断言」条）。
+    ensure_m6_done: bool = False
 
     def _edit(self, root: Path, target: str, marker: str, replacement: str) -> tuple[Path, bytes]:
         path = root / target
@@ -91,6 +97,10 @@ class Mutation:
 
         **删除形态**走"改名"而不是"删内容"——门判的是文件存在性。
         """
+        restores: list[tuple[Path, bytes]] = []
+        if self.ensure_m6_done:
+            restores.extend(_force_m6_done(root))
+
         target_path = root / self.target
         text = target_path.read_bytes().decode("utf-8")
         assert self.marker in text, f"{self.name}: marker 不在 {self.target} 中（变异会静默 no-op）"
@@ -101,13 +111,40 @@ class Mutation:
             original_bytes = target_path.read_bytes()
             target_path.rename(shadow)
             assert not target_path.exists(), f"{self.name}: 改名后原路径仍存在"
-            restores = [(target_path, original_bytes)]
+            restores.append((target_path, original_bytes))
         else:
-            restores = [self._edit(root, self.target, self.marker, self.replacement)]
+            restores.append(self._edit(root, self.target, self.marker, self.replacement))
 
         for extra_target, extra_marker, extra_replacement in self.extras:
             restores.append(self._edit(root, extra_target, extra_marker, extra_replacement))
         return restores
+
+
+#: `plan/00` 里程碑表里的 M6 行（首格就是里程碑号；门自己也是按这个口径选的）。
+_M6_ROW = re.compile(r"^\|\s*\*\*M6\b.*$", re.MULTILINE)
+#: 与 `check_sprint_layout.PENDING_MARKERS` 同口径。
+_PENDING = ("⬜", "🟡", "未开始", "未执行", "待执行", "待确认", "待 M")
+
+
+def _force_m6_done(root: Path) -> list[tuple[Path, bytes]]:
+    """把 `plan/00` 的 M6 行临时翻成 ✅（只为让 RELEASE / HANDOFFS 判据激活）。
+
+    返回还原项；**M6 已是 ✅ 时返回空表**（那时本函数什么都不做，变异照旧施加）。
+    """
+    path = root / "plan" / "00-README总览.md"
+    original = path.read_bytes()
+    text = original.decode("utf-8")
+    match = _M6_ROW.search(text)
+    assert match, "plan/00 找不到 M6 里程碑行（门与变异脚本的口径漂了）"
+    row = match.group(0)
+    if not any(mark in row for mark in _PENDING):
+        return []  # 已经 ✅：无需构造
+    cells = row.split("|")
+    cells[-2] = " ✅ 完成（变异构造） "
+    mutated = text.replace(row, "|".join(cells), 1)
+    assert mutated != text, "M6 行翻转后文本未变"
+    path.write_bytes(mutated.encode("utf-8"))
+    return [(path, original)]
 
 
 # ── 变异组 ────────────────────────────────────────────────────────────────
@@ -186,11 +223,13 @@ MUTATIONS: tuple[Mutation, ...] = (
         "LAYOUT.STATUS",
     ),
     Mutation(
-        "M11 发布里程碑 M6 翻 ✅ 但缺发布留档 → LAYOUT.RELEASE 必红",
-        "plan/00-README总览.md",
-        "| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |",
-        "| **M6 发布** | 干净环境验证 + 发布 | ✅ 完成 |",
+        "M11 发布里程碑已 ✅ 但发布留档不在位 → LAYOUT.RELEASE 必红",
+        "plan/RELEASE-M6.md",
+        "# RELEASE-M6 — 发布留档",
+        "",
         "LAYOUT.RELEASE",
+        kind="delete",
+        ensure_m6_done=True,
     ),
     Mutation(
         "M12 门自己的用法错误必须 rc=2（不用文件变异，见 verify_one）",
@@ -208,12 +247,8 @@ MUTATIONS: tuple[Mutation, ...] = (
         "LAYOUT.HANDOFFS",
         kind="delete",
         expect_green=True,
+        ensure_m6_done=True,
         extras=(
-            (
-                "plan/00-README总览.md",
-                "| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |",
-                "| **M6 发布** | 干净环境验证 + 发布 | ✅ 完成 |",
-            ),
             (
                 "tools/check_sprint_layout.py",
                 "HANDOFF_EXEMPT_LAST = False",
@@ -228,13 +263,7 @@ MUTATIONS: tuple[Mutation, ...] = (
         "",
         "LAYOUT.HANDOFFS",
         kind="delete",
-        extras=(
-            (
-                "plan/00-README总览.md",
-                "| **M6 发布** | 干净环境验证 + 发布 | ⬜ 未开始 |",
-                "| **M6 发布** | 干净环境验证 + 发布 | ✅ 完成 |",
-            ),
-        ),
+        ensure_m6_done=True,
     ),
 )
 
